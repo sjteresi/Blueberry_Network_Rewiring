@@ -1,0 +1,37 @@
+#!/bin/bash -login
+
+#SBATCH -J blastall_blueberry
+#SBATCH --time=04:00:00
+#SBATCH --cpus-per-task=4
+#SBATCH --mem-per-cpu=5G
+
+# Load Modules
+module purge
+module load BLAST/2.2.26-Linux_x86_64
+
+# BODY
+begin=`date +%s`
+echo $HOSTNAME
+echo "My Task ID:" $SLURM_ARRAY_TASK_ID
+
+cd /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/
+
+# Prepare the protein indices
+formatdb -i /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/At_Col_16746-CDS-prot.fasta -p T
+
+# Run the blast search
+blastall -p blastp -d \
+/mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/At_Col_16746-CDS-prot.fasta \
+-i /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/Vacc_v1.0_makerStandard_proteins_woTposases.fasta \
+-o /mnt/home/edgerpat/At-Grape.blast \
+-m 8 \
+-a 4 \
+-e 0.05
+
+
+
+end=`date +%s`
+elapsed=`expr $end - $begin`
+echo Time taken: $elapsed
+
+

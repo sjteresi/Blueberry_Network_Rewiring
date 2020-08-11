@@ -56,8 +56,13 @@ This section catalogs the versions of the genomes I used for this analysis and c
 \rowcolor{gray!50}
 \hline
 \textbf{Regular CoGE ID} & \textbf{Masked ID} \\ \hline
+<<<<<<< HEAD
 Arabidopsis thaliana Col-0 (id1) & CNS PL2.0 Masked Repeats 50X (v10, id 16746)\\ \hline
 Vaccinium corymbosum (id39928) & mask w/ RepeatMasker (v3, id 58746)\\ \hline
+=======
+Arabidopsis thaliana Col-0 (thale cress) (id1) & With CNS PL2.0 Masked Repeats 50X (v10, id 16746) \\ \hline
+Vaccinium corymbosum (id39928) & NCBI WindowMasker (Hard) (v3, id 58731) \\ \hline
+>>>>>>> Pre-filter workflow
 \end{tabular}
 \end{table}
 <!-- **** -->
@@ -100,4 +105,20 @@ The DAGChainer output file has a lot of extraneous information. We are going to 
 Please refer to the project README.md to ensure you have the correct Python packages.
 
 
+# Using BLAST to Supplement the Syntelog Search:
+We are doing this step to identify orthologs that may have been missed using a synteny-based approach. Orthologs we are hoping to find are single-gene transpositions. 
 
+We are going to use a BLAST database of protein predictions. 
+
+## Setting up a BLAST Database:
+
+```{python eval=FALSE}
+# To Load BLAST on the HPCC:
+module purge
+module load BLAST/2.2.26-Linux_x86_64
+```
+
+```{python eval=FALSE}
+# Test
+
+```
