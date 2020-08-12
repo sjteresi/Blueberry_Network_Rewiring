@@ -1,0 +1,15 @@
+# Exclude tex
+*.tex
+*.log
+
+# Exclude cache folder
+_cache/
+
+# Ignore the folder
+Grant/*
+
+# Ignore data folders but keep the folder
+data_input/*
+data_output/*
+!data_input/.gitkeep
+!data_output/.gitkeep

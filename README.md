@@ -16,4 +16,7 @@ Breed new blueberry cultivars that are resistant to the blueberry stem gall wasp
 
 
 # Installation and Dependencies:
-TODO add more here.
+I use Python and Pandas to perform data filtration following the generation of the syntelog list from CoGe. If you do not wish to do this through Python, you can of course do it just as easily in R. What follows are the instructions to make sure you have the same modules and versions as me when I ran this analysis.
+
+## Requirements:
+Please install **Pip** so that you may easily install Python packages. Then use Pip to go over our **requirements.txt** and install the needed Python packages: `pip install -r requirements.txt`. It is wise to create a virtual environment in case you have any conflicting package installations. Please refer to the [documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) for notes on that.
