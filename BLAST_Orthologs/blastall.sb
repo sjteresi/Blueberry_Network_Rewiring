@@ -23,7 +23,7 @@ formatdb -i /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/At_Col_167
 blastall -p blastp -d \
 /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/At_Col_16746-CDS-prot.fasta \
 -i /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/Vacc_v1.0_makerStandard_proteins_woTposases.fasta \
--o /mnt/home/edgerpat/At-Grape.blast \
+-o /mnt/research/edgerpat_lab/Scotty/Arab_Blueberry_BLAST_DB/At-Blueberry.blast \
 -m 8 \
 -a 4 \
 -e 0.05
