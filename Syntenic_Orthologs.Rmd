@@ -1,0 +1,103 @@
+---
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+    template: /home/scott/Documents/Templates/RMarkdown/svm-latex-ms.tex
+bibliography: master.bib
+header-includes:
+  -  \usepackage{hyperref}
+  -  \usepackage{caption}
+  -  \usepackage[table]{xcolor}
+biblio-style: apsr
+title: "Identify Blueberry to *Arabidopsis* Orthologs"
+author:
+- name: Scott J. Teresi
+  affiliation: Edger Lab - Michigan State University
+abstract: "This document contains my workflow, scripts and notes on generating *Vaccinium corymbosum* to *Arabidopsis thaliana* orthologs"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 12pt
+# spacing: double
+endnote: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE,
+                      message=FALSE, warning=FALSE,
+                      fig.path='figs/',
+                      cache.path = '_cache/',
+                      fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      })
+```
+# Approach:
+To identify orthologs, I am going to first identify orthologous genes using synteny. I will then follow up by using BLAST to identify any orthologs that we would've missed using the synteny-based approach (orthologous genes that may have translocated elsewhere, thus breaking synteny). 
+
+## Rough Outline
+1. Use **SynMap** on [CoGe](https://genomevolution.org/CoGe/SynMap.pl) to compare syntenic blocks between *Arabidopsis thaliana* and *Vaccinium corymbosum*. 
+
+2. Supplement results with BLAST search to catch any non-syntenic orthologs (single-gene transpositions).
+
+3. Clean up ortholog file, parse out gene-pairs that do not match our significance threshold. Finalize ortholog output.
+
+# Data Input and Genome Versions:
+This section catalogs the versions of the genomes I used for this analysis and contains the methods I used to generate, missing/supplementary files.
+
+\begin{table}[h!]
+\rowcolors{2}{gray!15}{white}
+\centering
+\caption*{\textbf{Genome Versions Used:}}
+\begin{tabular}{|l|l|}
+\rowcolor{gray!50}
+\hline
+\textbf{Regular CoGE ID} & \textbf{Masked ID} \\ \hline
+Arabidopsis thaliana Col-0 (id1) & CNS PL2.0 Masked Repeats 50X (v10, id 16746)\\ \hline
+Vaccinium corymbosum (id39928) & mask w/ RepeatMasker (v3, id 58746)\\ \hline
+\end{tabular}
+\end{table}
+<!-- **** -->
+
+# Running SynMap
+This section describes the methods to run [SynMap](https://genomevolution.org/CoGe/SynMap.pl) on CoGe. I will describe some of the options I have used here and why (in the following sections), but it would benefit the reader to go over [SynMap's documentation](https://genomevolution.org/wiki/index.php/SynMap#Advanced_Options) and read more about E-values.
+
+## SynMap Analysis Options:
+We are going to run SynMap with default options. Here is a link to the [documentation](https://genomevolution.org/wiki/index.php/SynMap). The default options at the time of writing are: \
+
+
+\begin{itemize}
+\item DAGChainer
+	\subitem Relative gene order
+	\subitem Maximum distance between two matches: \textit{20} genes
+	\subitem Minimum number of aligned pairs: \textit{5} genes
+\item Merge Syntenic Blocks
+	\subitem Algorithm: Quota Align Merge
+	\subitem Maximum distance between two blocks: \textit{4:1}
+\item Syntenic Depth
+	\subitem Algorithm ?????
+\item Fractionation Bias
+	\subitem Test???
+\item CodeML
+\item Advanced Options
+\end{itemize}
+
+
+
+## A Word on E-Values:
+Briefly, E-values, which stands for expectation value, is a correction of the p-value for multiple testing (we are multiple testing when we search each gene for a match in the other genome, and by chance we could generate a significant p-value, so we must enforce a mathematical correction). In the context of database searches the E-value is the number of distinct alignments with a score equivalent to or better than S^[S: A score is the numeral value that describes the overall waulity of an alignment, higher numbers means higher similarity.], that are expected to occur in the database search by chance.
+
+## SynMap Output:
+It outputs a tab-separated text file. I would encourage the reader to check out the summary of the output format from this [link](https://genomevolution.org/wiki/index.php/SynMap) under *Results* and *DAGChainer Output*. Here is the [link](https://genomevolution.org/r/1ejoj) to regenerate the analysis on CoGe.
+
+# Filter the Output File:
+The DAGChainer output file has a lot of extraneous information. We are going to distill it down into a 2-column tab-separated values (tsv) file. To do this we will use the Pandas module in Python to maniuplate the dataframe. If you have an aversion to Python you can always accomplish this task in R.
+
+## Set up Python Environment:
+Please refer to the project README.md to ensure you have the correct Python packages.
+
+
+
