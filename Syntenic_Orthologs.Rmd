@@ -111,6 +111,7 @@ We are doing this step to identify orthologs that may have been missed using a s
 We are going to use a BLAST database of protein predictions. 
 
 ## Setting up a BLAST Database:
+Please refer to the script at `BLAST_Orthologs/blastall.sb` for more information. First we generate a BLAST database and prepare it for protein indices. Then we can run the BLAST algorithm on the two sequence files, this may take awhile. For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
 
 ```{python eval=FALSE}
 # To Load BLAST on the HPCC:
@@ -122,3 +123,7 @@ module load BLAST/2.2.26-Linux_x86_64
 # Test
 
 ```
+
+# Merging Syntelogs and Orthologs Following BLAST
+Here I use a Python program to merge the files, making sure that I don't put the same gene twice, as the BLAST search could turn up some of the same gene pairs we found in the SynMap search.
+
