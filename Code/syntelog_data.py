@@ -26,10 +26,8 @@ class Syntelog_Data(object):
         """
         self._logger = logger or logging.getLogger(__name__)
         self.dataframe = syntelog_dataframe
-        self.A_chromosomes = self.dataframe.OrgA_Chromosome.to_numpy(copy=False)
-        self.B_chromosomes = self.dataframe.OrgB_Chromosome.to_numpy(copy=False)
 
-    def save_shortened_to_disk(self, filename):
+    def save_to_disk(self, filename):
         """
         Save the syntelogs to disk in a 2-column format.
         Arabidopsis in left-hand column, blueberry in right-hand column.
@@ -38,10 +36,10 @@ class Syntelog_Data(object):
             filename (str):
         """
         self.to_write = self.dataframe.copy(deep=True)
-        self.to_write.drop(
-            columns=["E_Value", "OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"],
-            inplace=True,
-        )
+        # self.to_write.drop(
+        # columns=["E_Value", "OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"],
+        # inplace=True,
+        # )
         self.to_write.to_csv(filename, sep="\t", header=True, index=False)
 
     def __repr__(self):
