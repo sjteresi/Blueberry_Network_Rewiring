@@ -127,3 +127,8 @@ module load BLAST/2.2.26-Linux_x86_64
 # Merging Syntelogs and Orthologs Following BLAST
 Here I use a Python program to merge the files, making sure that I don't put the same gene twice, as the BLAST search could turn up some of the same gene pairs we found in the SynMap search.
 
+## 
+Only take the first blueberry gene, that one is the most significant.
+
+
+**Need to see if the gene features are collinear**. How do I do this?

@@ -13,13 +13,14 @@ import logging
 import coloredlogs
 import pandas as pd
 
-from Syntelogs.import_syntelogs import import_syntelogs
-from Syntelogs.syntelog_data import Syntelog_Data
+from Code.import_syntelogs import import_syntelogs
+from Code.import_orthologs import import_orthologs
+from Code.syntelog_data import Syntelog_Data
 
 
-def process(input_gene_data, data_output_path):
+def process(syntelog_input_file, ortholog_input_file, data_output_path):
     # Import the data from raw file
-    syntelogs = import_syntelogs(input_gene_data)
+    syntelogs = import_syntelogs(syntelog_input_file)
 
     # Wrap the data
     instance_Syntelog_Data = Syntelog_Data(syntelogs)
@@ -27,13 +28,22 @@ def process(input_gene_data, data_output_path):
         os.path.join(data_output_path, "save_test.tsv")
     )
 
+    # Import the data from raw file
+    orthologs = import_orthologs(ortholog_input_file)
+    print(orthologs)
+
 
 if __name__ == "__main__":
     """Command line interface to link syntelogs together."""
 
     parser = argparse.ArgumentParser(description="Filter syntelogs")
     path_main = os.path.abspath(__file__)
-    parser.add_argument("genes_input_file", type=str, help="parent path of gene file")
+    parser.add_argument(
+        "syntelog_input_file", type=str, help="parent path of syntelog file"
+    )
+    parser.add_argument(
+        "ortholog_input_file", type=str, help="parent path of ortholog file"
+    )
     parser.add_argument(
         "--output_directory",
         type=str,
@@ -52,7 +62,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    args.genes_input_file = os.path.abspath(args.genes_input_file)
+    args.syntelog_input_file = os.path.abspath(args.syntelog_input_file)
+    args.ortholog_input_file = os.path.abspath(args.ortholog_input_file)
     args.output_directory = os.path.abspath(args.output_directory)
     args.input_directory = os.path.abspath(args.input_directory)
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -60,4 +71,4 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     # Process
-    process(args.genes_input_file, args.output_directory)
+    process(args.syntelog_input_file, args.ortholog_input_file, args.output_directory)
