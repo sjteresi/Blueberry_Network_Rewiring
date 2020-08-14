@@ -1,6 +1,7 @@
 # Exclude tex
 *.tex
 *.log
+*.pyc
 
 # Exclude cache folder
 _cache/

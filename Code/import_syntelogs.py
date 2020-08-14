@@ -36,7 +36,7 @@ def import_syntelogs(syntelog_input_file):
         "Diagonal_Score",
     ]
 
-    Gene_Data = pd.read_csv(
+    gene_data = pd.read_csv(
         syntelog_input_file,
         sep="\t+",
         header=None,
@@ -47,26 +47,46 @@ def import_syntelogs(syntelog_input_file):
     )
 
     # Set the correct data types
-    Gene_Data.OrgA_Chromosome = Gene_Data.OrgA_Chromosome.astype(str)
-    Gene_Data.OrgB_Chromosome = Gene_Data.OrgB_Chromosome.astype(str)
-    Gene_Data.OrgA_Gene_Region = Gene_Data.OrgA_Gene_Region.astype(str)
-    Gene_Data.OrgB_Gene_Region = Gene_Data.OrgB_Gene_Region.astype(str)
-    Gene_Data.E_Value = Gene_Data.E_Value.astype("float64")
-    Gene_Data.Diagonal_Score = Gene_Data.Diagonal_Score.astype("int32")
+    gene_data.OrgA_Chromosome = gene_data.OrgA_Chromosome.astype(str)
+    gene_data.OrgB_Chromosome = gene_data.OrgB_Chromosome.astype(str)
+    gene_data.OrgA_Gene_Region = gene_data.OrgA_Gene_Region.astype(str)
+    gene_data.OrgB_Gene_Region = gene_data.OrgB_Gene_Region.astype(str)
+    gene_data.E_Value = gene_data.E_Value.astype("float64")
+    gene_data.Diagonal_Score = gene_data.Diagonal_Score.astype("int32")
 
     # Get the correct name for the genes
-    Gene_Data["OrgA_Gene_Region"] = (
-        Gene_Data["OrgA_Gene_Region"].str.split("\|\|").str[3]
+    gene_data["OrgA_Gene_Region"] = (
+        gene_data["OrgA_Gene_Region"].str.split("\|\|").str[3]
     )
-    Gene_Data["OrgB_Gene_Region"] = (
-        Gene_Data["OrgB_Gene_Region"].str.split("\|\|").str[3]
+    gene_data["OrgB_Gene_Region"] = (
+        gene_data["OrgB_Gene_Region"].str.split("\|\|").str[3]
+    )
+
+    # Get the correct name for the blueberry genes
+    gene_data["OrgB_Gene_Region"] = (
+        gene_data["OrgB_Gene_Region"].str.split("-mRNA-1").str[0]
     )
 
     # Get the correct name for the chromosome
-    Gene_Data["OrgA_Chromosome"] = Gene_Data["OrgA_Chromosome"].str.split("_").str[1]
-    Gene_Data["OrgB_Chromosome"] = Gene_Data["OrgB_Chromosome"].str.split("_").str[1]
+    gene_data["OrgA_Chromosome"] = gene_data["OrgA_Chromosome"].str.split("_").str[1]
+    gene_data["OrgB_Chromosome"] = gene_data["OrgB_Chromosome"].str.split("_").str[1]
 
+    # This step is important, it could differ if your data input is different.
+    gene_data.rename(
+        columns={"OrgA_Gene_Region": "Arabidopsis", "OrgB_Gene_Region": "Blueberry"},
+        inplace=True,
+    )
     # Trim E-values less than 0.05
-    Gene_Data = Gene_Data.loc[Gene_Data["E_Value"] < 0.05]
+    gene_data = gene_data.loc[gene_data["E_Value"] < 0.05]
 
-    return Gene_Data
+    gene_data.drop(
+        columns=["OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"], inplace=True,
+    )
+
+    gene_data["Point_of_Origin"] = "Synteny"
+
+    # Need to take first occurrence of the gene, the one with the smallest
+    # E-Value
+    gene_data = gene_data.loc[gene_data.groupby("Blueberry")["E_Value"].idxmin()]
+
+    return gene_data
