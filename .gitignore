@@ -3,6 +3,9 @@
 *.log
 *.pyc
 
+# Exclude pycache folder
+Code/__pycache__/*
+
 # Exclude cache folder
 _cache/
 
@@ -10,7 +13,7 @@ _cache/
 Grant/*
 
 # Ignore data folders but keep the folder
-data_input/*
-data_output/*
-!data_input/.gitkeep
-!data_output/.gitkeep
+Syntelogs_and_Homologs/data_input/*
+Syntelogs_and_Homologs/data_output/*
+!Syntelogs_and_Homologs/data_input/.gitkeep
+!Syntelogs_and_Homologs/data_output/.gitkeep

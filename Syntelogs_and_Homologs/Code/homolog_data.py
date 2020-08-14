@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Wrappers for input data, multiple ortholog pairs.
+Wrappers for input data, multiple homolog pairs.
 
 Used to provide a common interface and fast calculations with numpy.
 """
@@ -13,19 +13,19 @@ import numpy as np
 import pandas as pd
 
 
-class Ortholog_Data(object):
+class Homolog_Data(object):
     """
 
     """
 
-    def __init__(self, ortholog_dataframe, logger=None):
+    def __init__(self, homolog_dataframe, logger=None):
         """Initialize.
 
         Args:
-            ortholog_dataframe (DataFrame): ortholog data frame.
+            homolog_dataframe (DataFrame): homolog data frame.
         """
         self._logger = logger or logging.getLogger(__name__)
-        self.dataframe = ortholog_dataframe
+        self.dataframe = homolog_dataframe
 
     def save_to_disk(self, filename):
         """
@@ -41,4 +41,4 @@ class Ortholog_Data(object):
         """
         String representation for developer.
         """
-        return "Ortholog_Data{}".format(self.dataframe)
+        return "Homolog_Data{}".format(self.dataframe)

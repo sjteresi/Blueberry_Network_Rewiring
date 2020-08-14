@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-Test
-"""
-
 __author__ = "Scott Teresi"
 
 import pandas as pd
@@ -11,8 +7,9 @@ import pandas as pd
 
 def import_syntelogs(syntelog_input_file):
     """
-
+    Import the orthologs from the raw file and manage data filtration
     """
+
     col_names = [
         "OrgA_Chromosome",
         "OrgA_Gene_Region",
@@ -83,6 +80,8 @@ def import_syntelogs(syntelog_input_file):
         columns=["OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"], inplace=True,
     )
 
+    # Add column with identifier so we can later see what source we derived the
+    # gene pair from
     gene_data["Point_of_Origin"] = "Synteny"
 
     # Need to take first occurrence of the gene, the one with the smallest

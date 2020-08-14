@@ -12,11 +12,11 @@ header-includes:
   -  \usepackage{caption}
   -  \usepackage[table]{xcolor}
 biblio-style: apsr
-title: "Identify Blueberry to *Arabidopsis* Orthologs"
+title: "Identify Blueberry to *Arabidopsis* Syntelogs and Homologs"
 author:
 - name: Scott J. Teresi
   affiliation: Edger Lab - Michigan State University
-abstract: "This document contains my workflow, scripts and notes on generating *Vaccinium corymbosum* to *Arabidopsis thaliana* orthologs"
+abstract: "This document contains my workflow, scripts and notes on generating *Vaccinium corymbosum* to *Arabidopsis thaliana* homologs"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
 fontfamily: mathpazo
@@ -36,12 +36,12 @@ knitr::opts_chunk$set(cache=TRUE,
                       })
 ```
 # Approach:
-To identify orthologs, I am going to first identify orthologous genes using synteny. I will then follow up by using BLAST to identify any orthologs that we would've missed using the synteny-based approach (orthologous genes that may have translocated elsewhere, thus breaking synteny). 
+To identify homologs, I am going to first identify orthologous genes using synteny. I will then follow up by using BLAST to identify any homologs that we would've missed using the synteny-based approach (orthologous genes that may have translocated elsewhere, thus breaking synteny). 
 
 ## Rough Outline
 1. Use **SynMap** on [CoGe](https://genomevolution.org/CoGe/SynMap.pl) to compare syntenic blocks between *Arabidopsis thaliana* and *Vaccinium corymbosum*. 
 
-2. Supplement results with BLAST search to catch any non-syntenic orthologs (single-gene transpositions).
+2. Supplement results with BLAST search to catch any non-syntenic homologs (single-gene transpositions).
 
 3. Clean up ortholog file, parse out gene-pairs that do not match our significance threshold. Finalize ortholog output.
 
@@ -106,7 +106,7 @@ Please refer to the project README.md to ensure you have the correct Python pack
 
 
 # Using BLAST to Supplement the Syntelog Search:
-We are doing this step to identify orthologs that may have been missed using a synteny-based approach. Orthologs we are hoping to find are single-gene transpositions. 
+We are doing this step to identify homologs that may have been missed using a synteny-based approach. Homologs we are hoping to find are single-gene transpositions. 
 
 We are going to use a BLAST database of protein predictions. 
 
@@ -124,7 +124,7 @@ module load BLAST/2.2.26-Linux_x86_64
 
 ```
 
-# Merging Syntelogs and Orthologs Following BLAST
+# Merging Syntelogs and Homologs Following BLAST
 Here I use a Python program to merge the files, making sure that I don't put the same gene twice, as the BLAST search could turn up some of the same gene pairs we found in the SynMap search.
 
 ## 
@@ -132,3 +132,6 @@ Only take the first blueberry gene, that one is the most significant.
 
 
 **Need to see if the gene features are collinear**. How do I do this?
+
+# Merging Genes From Expression Analyses with Synteny/Homology Gene List:
+Plan: Take my list of Arabidopsis/Blueberry gene pairs and take whatever pairs I have a match for from my blueberry RNA-seq expression project.
