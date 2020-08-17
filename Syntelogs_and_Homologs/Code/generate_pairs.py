@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Filter syntelogs from CoGe output file
+Master code file. Control filtration of syntelog data and homolog data. Manage
+merging of the two dataframes and orchestrate all file commands.
 """
 
 __author__ = "Scott Teresi"
@@ -14,15 +15,16 @@ import coloredlogs
 import pandas as pd
 
 from Code.import_syntelogs import import_syntelogs
-from Code.import_orthologs import import_orthologs
+from Code.import_homologs import import_homologs
 from Code.syntelog_data import Syntelog_Data
-from Code.ortholog_data import Ortholog_Data
-from Code.merge_ortho_synt import merge_ortho_synt
+from Code.homolog_data import Homolog_Data
+from Code.merge_homo_synt import merge_homo_synt
 from Code.merged_all_data import Merged_Data
 
 
-def process(syntelog_input_file, ortholog_input_file, data_output_path):
+def process(syntelog_input_file, homolog_input_file, data_output_path):
     # Import the data from raw file
+    logger.info("Working on syntelogs...")
     syntelogs = import_syntelogs(syntelog_input_file)
 
     # Wrap the data
@@ -32,21 +34,25 @@ def process(syntelog_input_file, ortholog_input_file, data_output_path):
     )
 
     # Import the data from raw file
-    orthologs = import_orthologs(ortholog_input_file)
+    logger.info("Working on homologs...")
+    homologs = import_homologs(homolog_input_file)
 
     # Wrap the data
-    instance_Ortholog_Data = Ortholog_Data(orthologs)
-    instance_Ortholog_Data.save_to_disk(
-        os.path.join(data_output_path, "set_orthologs.tsv")
+    instance_Homolog_Data = Homolog_Data(homologs)
+    # Save to disk
+    instance_Homolog_Data.save_to_disk(
+        os.path.join(data_output_path, "set_homologs.tsv")
     )
 
     # Merge the data
-    merged_all = merge_ortho_synt(instance_Syntelog_Data, instance_Ortholog_Data)
+    logger.info("Merging the data...")
+    merged_all = merge_homo_synt(instance_Syntelog_Data, instance_Homolog_Data)
 
     # Wrap the data
     instance_Merged_Data = Merged_Data(merged_all)
+    # Save to disk
     instance_Merged_Data.save_to_disk(
-        os.path.join(data_output_path, "merged_orth_and_syn.tsv")
+        os.path.join(data_output_path, "merged_homo_and_syn.tsv")
     )
 
 
@@ -59,7 +65,7 @@ if __name__ == "__main__":
         "syntelog_input_file", type=str, help="parent path of syntelog file"
     )
     parser.add_argument(
-        "ortholog_input_file", type=str, help="parent path of ortholog file"
+        "homolog_input_file", type=str, help="parent path of homolog file"
     )
     parser.add_argument(
         "--output_directory",
@@ -80,7 +86,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args.syntelog_input_file = os.path.abspath(args.syntelog_input_file)
-    args.ortholog_input_file = os.path.abspath(args.ortholog_input_file)
+    args.homolog_input_file = os.path.abspath(args.homolog_input_file)
     args.output_directory = os.path.abspath(args.output_directory)
     args.input_directory = os.path.abspath(args.input_directory)
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -88,4 +94,5 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     # Process
-    process(args.syntelog_input_file, args.ortholog_input_file, args.output_directory)
+    logger.info("Starting filtration...")
+    process(args.syntelog_input_file, args.homolog_input_file, args.output_directory)

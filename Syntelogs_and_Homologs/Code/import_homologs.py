@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 
-"""
-Test
-"""
-
 __author__ = "Scott Teresi"
 
 import pandas as pd
 
 
-def import_orthologs(syntelog_input_file):
+def import_homologs(homolog_input_file):
     """
-
+    Import the homologs from the raw file and manage data filtration
     """
     col_names = [
         "Query",
@@ -35,7 +31,7 @@ def import_orthologs(syntelog_input_file):
     ]
 
     gene_data = pd.read_csv(
-        syntelog_input_file,
+        homolog_input_file,
         sep="\t+",
         header=None,
         engine="python",
@@ -62,6 +58,9 @@ def import_orthologs(syntelog_input_file):
     gene_data.rename(
         columns={"Query": "Blueberry", "Subject": "Arabidopsis"}, inplace=True
     )
+
+    # Add column with identifier so we can later see what source we derived the
+    # gene pair from
     gene_data["Point_of_Origin"] = "BLAST"
 
     return gene_data
