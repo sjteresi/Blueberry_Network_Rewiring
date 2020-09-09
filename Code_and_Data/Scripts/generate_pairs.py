@@ -12,18 +12,21 @@ import os
 
 import logging
 import coloredlogs
-import pandas as pd
 
-from Code.import_syntelogs import import_syntelogs
-from Code.import_homologs import import_homologs
-from Code.syntelog_data import Syntelog_Data
-from Code.homolog_data import Homolog_Data
-from Code.merge_homo_synt import merge_homo_synt
-from Code.merged_all_data import Merged_Data
+from Code_and_Data.Scripts.import_syntelogs import import_syntelogs
+from Code_and_Data.Scripts.import_syntelogs import Syntelog_Data
+from Code_and_Data.Scripts.import_homologs import import_homologs
+from Code_and_Data.Scripts.import_homologs import Homolog_Data
+from Code_and_Data.Scripts.merge_homo_synt import merge_homo_synt
+from Code_and_Data.Scripts.merge_homo_synt import Merged_Data
+from Code_and_Data.Scripts.import_diff_exp import ExpData
+from Code_and_Data.Scripts.union_data import Union_Data
 
 
-def process(syntelog_input_file, homolog_input_file, data_output_path):
-    # Import the data from raw file
+def process(
+    syntelog_input_file, homolog_input_file, data_output_path, diff_exp_dir, stat_type,
+):
+    # Import the synteny data from raw file
     logger.info("Working on syntelogs...")
     syntelogs = import_syntelogs(syntelog_input_file)
 
@@ -33,7 +36,7 @@ def process(syntelog_input_file, homolog_input_file, data_output_path):
         os.path.join(data_output_path, "set_syntelogs.tsv")
     )
 
-    # Import the data from raw file
+    # Import the homology (BLAST) data from raw file
     logger.info("Working on homologs...")
     homologs = import_homologs(homolog_input_file)
 
@@ -44,7 +47,7 @@ def process(syntelog_input_file, homolog_input_file, data_output_path):
         os.path.join(data_output_path, "set_homologs.tsv")
     )
 
-    # Merge the data
+    # Merge the synteny and homology data
     logger.info("Merging the data...")
     merged_all = merge_homo_synt(instance_Syntelog_Data, instance_Homolog_Data)
 
@@ -54,6 +57,23 @@ def process(syntelog_input_file, homolog_input_file, data_output_path):
     instance_Merged_Data.save_to_disk(
         os.path.join(data_output_path, "merged_homo_and_syn.tsv")
     )
+    # synteny_count, blast_count = instance_Merged_Data.total_count_summary
+
+    # Get differential expression data
+    logger.info("Getting the differential expression data...")
+    instance_Exp_Data = ExpData(diff_exp_dir)
+
+    # Get union of blueberry genes between diff exp and synteny/homology,
+    # and thus the corresponding Arabidopsis gene
+    logger.info("Find the union between the diff exp data and the merged data")
+    union_data_output_dir = os.path.join(data_output_path, "Union", stat_type)
+    if not os.path.exists(union_data_output_dir):
+        os.makedirs(union_data_output_dir)
+    union_obj = Union_Data(instance_Merged_Data, instance_Exp_Data)
+
+    # Save results to disk
+    union_obj.save_union(union_data_output_dir)
+    union_obj.save_summary_union(union_data_output_dir)
 
 
 if __name__ == "__main__":
@@ -67,6 +87,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "homolog_input_file", type=str, help="parent path of homolog file"
     )
+
+    parser.add_argument(
+        "diff_ex_dir", type=str, help="parent path of input directory",
+    )
+
+    parser.add_argument(
+        "stat_type", type=str, help="what type of error correction did you use",
+    )
+
     parser.add_argument(
         "--output_directory",
         type=str,
@@ -87,6 +116,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.syntelog_input_file = os.path.abspath(args.syntelog_input_file)
     args.homolog_input_file = os.path.abspath(args.homolog_input_file)
+    args.diff_ex_dir = os.path.abspath(args.diff_ex_dir)
     args.output_directory = os.path.abspath(args.output_directory)
     args.input_directory = os.path.abspath(args.input_directory)
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -95,4 +125,10 @@ if __name__ == "__main__":
 
     # Process
     logger.info("Starting filtration...")
-    process(args.syntelog_input_file, args.homolog_input_file, args.output_directory)
+    process(
+        args.syntelog_input_file,
+        args.homolog_input_file,
+        args.output_directory,
+        args.diff_ex_dir,
+        args.stat_type,
+    )
