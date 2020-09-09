@@ -100,14 +100,14 @@ if __name__ == "__main__":
         "--output_directory",
         type=str,
         help="parent path of output directory",
-        default=os.path.join(path_main, "../../data_output"),
+        default=os.path.join(path_main, "../../../Blueberry_Data/AtBB/data_output"),
     )
 
     parser.add_argument(
         "--input_directory",
         type=str,
         help="parent path of input directory",
-        default=os.path.join(path_main, "../../data_input"),
+        default=os.path.join(path_main, "../../../Blueberry_Data/AtBB/data_input"),
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="set debugging level to DEBUG"
