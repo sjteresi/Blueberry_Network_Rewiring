@@ -25,7 +25,7 @@ from union_data import Union_Data
 
 
 def process(
-    syntelog_input_file, homolog_input_file, data_output_path, diff_exp_dir, stat_type,
+    syntelog_input_file, homolog_input_file, data_output_path, diff_exp_dir, stat_type,haplotype
 ):
     # Import the synteny data from raw file
     logger.info("Importing syntelogs: %s" % syntelog_input_file)
@@ -70,7 +70,7 @@ def process(
     # Get union of blueberry genes between diff exp and synteny/homology,
     # and thus the corresponding Arabidopsis gene
     logger.info("Find the union between the diff exp data and the merged data")
-    union_data_output_dir = os.path.join(data_output_path, "Union", stat_type)
+    union_data_output_dir = os.path.join(data_output_path, "Union", haplotype, stat_type)
     if not os.path.exists(union_data_output_dir):
         os.makedirs(union_data_output_dir)
     union_obj = Union_Data(instance_Merged_Data, instance_Exp_Data)
@@ -100,7 +100,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "stat_type", type=str, help="what type of error correction did you use",
     )
-
+    parser.add_argument(
+        "haplotype", type=str, help="single or all dataset" 
+    )
     parser.add_argument(
         "--output_directory",
         type=str,
@@ -136,4 +138,5 @@ if __name__ == "__main__":
         args.output_directory,
         args.diff_ex_dir,
         args.stat_type,
+        args.haplotype,
     )
