@@ -12,14 +12,21 @@ import pandas as pd
 
 class ExpData(object):
     def __init__(self, differential_exp_dir):
-        """Initialize"""
+        """Initialize
+        Args:
+            differential_exp_dir (str): String representing the path of the
+            directory containing the differentially expressed genes.
+            They are outputted from EdgeR.
+        """
         self.exp_dict = self.load_diff_exp_sets(differential_exp_dir)
 
-    @classmethod
-    def load_diff_exp_sets(cls, differential_exp_dir):
+    @staticmethod
+    def load_diff_exp_sets(differential_exp_dir):
         """
         Args:
-            differential_exp_dir (str): Directory of datafiles
+            differential_exp_dir (str): String representing the path of the
+            directory containing the differentially expressed genes.
+            They are outputted from EdgeR.
 
         Returns:
             my_file_dict (dictionary of pandaframes):
@@ -30,7 +37,7 @@ class ExpData(object):
                 my_file = entry.path
                 pandas_dataframe = pd.read_csv(my_file, sep="\t", header="infer")
 
-                pandas_dataframe = cls.filter_diff_exp_p_val(pandas_dataframe)
+                pandas_dataframe = ExpData.filter_diff_exp(pandas_dataframe)
 
                 my_file_dict[
                     os.path.splitext(os.path.basename(my_file))[0]
@@ -38,17 +45,17 @@ class ExpData(object):
         return my_file_dict
 
     @staticmethod
-    def filter_diff_exp_p_val(diff_exp_dataframe):
+    def filter_diff_exp(diff_exp_dataframe):
         """
-        Filter the differential expression data by a P-Value cutoff
+        Filter the differentially expressed genes, values can be either -1, 0,
+        or 1. Non-zero tagged genes were expressed in a positive or negative
+        direction and are significant
 
         Args:
-            differential_exp_dir (str): Directory of datafiles
-
+            diff_exp_dataframe (pandas DataFrame): See above
         Returns:
-            diff_exp_dataframe (pandas DataFrame): Now with only rows whose P-Value
-            is less than the cutoff
-        """
+            diff_exp_dataframe (pandas DataFrame): Now with only rows that had
+            a -1 or 1"""
         return diff_exp_dataframe.loc[
             diff_exp_dataframe["Direction_Differentially_Regulated"] != 0
         ]

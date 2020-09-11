@@ -116,12 +116,12 @@ class Syntelog_Data(object):
         Args:
             filename (str): path for the file
         """
-        self.to_write = self.dataframe.copy(deep=True)
+        # self.to_write = self.dataframe.copy(deep=True)
         # self.to_write.drop(
         # columns=["E_Value", "OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"],
         # inplace=True,
         # )
-        self.to_write.to_csv(filename, sep="\t", header=True, index=False)
+        self.dataframe.to_csv(filename, sep="\t", header=True, index=False)
 
     def __repr__(self):
         """

@@ -13,50 +13,54 @@ import os
 import logging
 import coloredlogs
 
-from Code_and_Data.Scripts.import_syntelogs import import_syntelogs
-from Code_and_Data.Scripts.import_syntelogs import Syntelog_Data
-from Code_and_Data.Scripts.import_homologs import import_homologs
-from Code_and_Data.Scripts.import_homologs import Homolog_Data
-from Code_and_Data.Scripts.merge_homo_synt import merge_homo_synt
-from Code_and_Data.Scripts.merge_homo_synt import Merged_Data
-from Code_and_Data.Scripts.import_diff_exp import ExpData
-from Code_and_Data.Scripts.union_data import Union_Data
+
+from import_syntelogs import import_syntelogs
+from import_syntelogs import Syntelog_Data
+from import_homologs import import_homologs
+from import_homologs import Homolog_Data
+from merge_homo_synt import merge_homo_synt
+from merge_homo_synt import Merged_Data
+from import_diff_exp import ExpData
+from union_data import Union_Data
 
 
 def process(
     syntelog_input_file, homolog_input_file, data_output_path, diff_exp_dir, stat_type,
 ):
     # Import the synteny data from raw file
-    logger.info("Working on syntelogs...")
+    logger.info("Importing syntelogs: %s" % syntelog_input_file)
     syntelogs = import_syntelogs(syntelog_input_file)
 
     # Wrap the data
+    logger.debug("Wrapping Syntelog_Data...")
     instance_Syntelog_Data = Syntelog_Data(syntelogs)
-    instance_Syntelog_Data.save_to_disk(
-        os.path.join(data_output_path, "set_syntelogs.tsv")
-    )
+    file_to_save = os.path.join(data_output_path, "set_syntelogs.tsv")
+    logger.info("Writing syntelog data to disk: %s" % file_to_save)
+    instance_Syntelog_Data.save_to_disk(file_to_save)
 
     # Import the homology (BLAST) data from raw file
-    logger.info("Working on homologs...")
+    logger.info("Importing BLAST results: %s" % homolog_input_file)
     homologs = import_homologs(homolog_input_file)
 
     # Wrap the data
+    logger.debug("Wrapping Homolog_Data...")
     instance_Homolog_Data = Homolog_Data(homologs)
     # Save to disk
-    instance_Homolog_Data.save_to_disk(
-        os.path.join(data_output_path, "set_homologs.tsv")
-    )
+    file_to_save = os.path.join(data_output_path, "set_homologs.tsv")
+    logger.info("Writing homolog data to disk: %s" % file_to_save)
+    instance_Homolog_Data.save_to_disk(file_to_save)
 
     # Merge the synteny and homology data
-    logger.info("Merging the data...")
+    logger.debug("Merging the data...")
     merged_all = merge_homo_synt(instance_Syntelog_Data, instance_Homolog_Data)
 
     # Wrap the data
+    logger.debug("Wrapping the merged data...")
     instance_Merged_Data = Merged_Data(merged_all)
     # Save to disk
-    instance_Merged_Data.save_to_disk(
-        os.path.join(data_output_path, "merged_homo_and_syn.tsv")
-    )
+    file_to_save = os.path.join(data_output_path, "merged_homo_and_syn.tsv")
+    logger.info("Writing merged data to disk: %s" % file_to_save)
+    instance_Merged_Data.save_to_disk(file_to_save)
     # synteny_count, blast_count = instance_Merged_Data.total_count_summary
 
     # Get differential expression data
@@ -72,6 +76,7 @@ def process(
     union_obj = Union_Data(instance_Merged_Data, instance_Exp_Data)
 
     # Save results to disk
+    logger.info("Saving union results to disk: %s" % union_data_output_dir)
     union_obj.save_union(union_data_output_dir)
     union_obj.save_summary_union(union_data_output_dir)
 
@@ -100,7 +105,7 @@ if __name__ == "__main__":
         "--output_directory",
         type=str,
         help="parent path of output directory",
-        default=os.path.join(path_main, "../../../Blueberry_Data/AtBB/data_output"),
+        default=os.path.join(path_main, "../../../../Blueberry_Data/AtBB/data_output"),
     )
 
     parser.add_argument(
