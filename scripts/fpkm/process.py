@@ -17,7 +17,7 @@ from fpkm import calc_fpkm
 
 
 # TODO Alder modify function call
-def process(gene_annotation, count_matrix, output_dir):
+def process(gene_annotation, count_matrix, output_dir, file_name):
     """Run the script, go from annotation and count file to FPKM table.
 
     Args:
@@ -54,7 +54,7 @@ def process(gene_annotation, count_matrix, output_dir):
 
     # TODO Alder modify this call, use str(x + y) notation on the
     # 'Blueberry_FPKM' part
-    fpkm_vals.to_csv(os.path.join(output_dir, "Blueberry_FPKM.tsv"), sep="\t")
+    fpkm_vals.to_csv(os.path.join(output_dir, f"Blueberry_FPKM_{file_name}.tsv"), sep="\t")
 
 
 if __name__ == "__main__":
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     path_main = os.path.abspath(__file__)
     parser.add_argument("genes_input_file", type=str, help="parent path of gene file")
     parser.add_argument("count_matrix", type=str, help="parent path of counts file")
+    parser.add_argument("selection", type=str, help= "all or single haplotype")
     parser.add_argument(
         "--output_dir",
         "-o",
@@ -77,4 +78,4 @@ if __name__ == "__main__":
     args.output_dir = os.path.abspath(args.output_dir)
 
     # TODO Alder modify function call
-    process(args.genes_input_file, args.count_matrix, args.output_dir)
+    process(args.genes_input_file, args.count_matrix, args.output_dir, args.selection)
