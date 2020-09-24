@@ -1,0 +1,28 @@
+#!/bin/bash -login
+
+#SBATCH -J wgcna_blueberry
+#SBATCH --time=01:00:00
+#SBATCH --cpus-per-task=6
+#SBATCH --mem-per-cpu=30G
+
+# Load Modules
+module purge
+module load GCC/8.3.0
+module load OpenMPI/3.1.4
+module load R/4.0.2
+
+# BODY
+begin=`date +%s`
+echo $HOSTNAME
+echo "My Task ID:" $SLURM_ARRAY_TASK_ID
+
+# source activate wgcna
+cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Networking/scripts/WGCNA/
+
+Rscript Blueberry_WGCNA.R
+
+
+
+end=`date +%s`
+elapsed=`expr $end - $begin`
+echo Time taken: $elapsed
