@@ -62,3 +62,13 @@ We want to examine our merged data file, and take the subset of Arabidopsis-Blue
 
 ## fpkm:
 
+## WGCNA:
+[WGNCA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/index.html) is an R package for creating **Weighted Gene Co-Expression Networks**. We are using it to identify clusters (modules) of highly correlated genes; we will use that as a lens to interpret the functions and relations of genes involved in galling response.
+
+In regards to the code, I follow the tutorials found at this [link](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/), where I follow **part I**. The code found in `scripts/WGCNA` is an adapted version of the tutorials, notably there are no clinical traits that I am relating modules to.
+
+### WGCNA Code Version Control:
+* R == 4.0.2
+* WGCNA == 1.69
+* tidyverse == 1.3.0
+* docstring == 1.0.0
