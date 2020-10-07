@@ -7,25 +7,50 @@ allowWGCNAThreads(6)
 WGCNAnThreads()
 
 
-load_singlehap = function(){
+load_single_hap = function(){
 	# Read in the blueberry data set
 	# Each row is a gene and each column is a library.
   	setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/TPM")
-	SingleHap_BlueberryData = read.csv("Blueberry_TPM_Single.tsv", header=TRUE, sep='\t', row.names='Gene_Name')
+	SingleHap_BlueberryData = read.csv("Blueberry_TPM_Single.tsv", header=TRUE, sep='\t')
 	return(SingleHap_BlueberryData)
 }
 
-load_allhap = function(){
+load_all_hap = function(){
 	# Read in the blueberry data set
 	# Each row is a gene and each column is a library.
   	setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/TPM")
-	AllHap_BlueberryData = read.csv("Blueberry_TPM_All.tsv", header=TRUE, sep='\t', row.names='Gene_Name')
+	AllHap_BlueberryData = read.csv("Blueberry_TPM_All.tsv", header=TRUE, sep='\t')
+	return(AllHap_BlueberryData)
+}
+
+load_all_hap_hpcc = function(){
+	# Read in the blueberry data set
+	# Each row is a gene and each column is a library.
+  	setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
+	AllHap_BlueberryData = read.csv("Blueberry_TPM_All.tsv", header=TRUE, sep='\t')
+	return(AllHap_BlueberryData)
+}
+
+load_80 = function(){
+	# Read in the blueberry data set
+	# Each row is a gene and each column is a library.
+  	setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
+	AllHap_BlueberryData = read.csv("test_80.tsv", header=TRUE, sep='\t')
+	return(AllHap_BlueberryData)
+}
+
+load_60 = function(){
+	# Read in the blueberry data set
+	# Each row is a gene and each column is a library.
+  	setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
+	AllHap_BlueberryData = read.csv("test_60.tsv", header=TRUE, sep='\t')
 	return(AllHap_BlueberryData)
 }
 
 load_all_test = function(){
 	# Read in the blueberry data set
 	# Each row is a gene and each column is a library.
+  	#setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
   	setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/TPM")
 	AllHap_BlueberryData = read.csv("Blueberry_TPM_all40.tsv", header=TRUE, sep='\t')
 	return(AllHap_BlueberryData)
@@ -54,7 +79,9 @@ soft_threshold_graph = function(data_matrix){
         par(mfrow = c(1,2));
         cex1 = 0.9;
         # Scale-free topology fit index as a function of the soft-thresholding power
-        jpeg(file='scale_free_topology_fit.jpeg', width=800, height=500)
+        #jpeg(file='scale_free_topology_fit.jpeg', width=800, height=500)
+	print('soft thresh')
+        pdf(file='scale_free_topology_fit.pdf', width=8, height=5)
         plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
              xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
              main = paste("Scale independence"));
@@ -63,7 +90,9 @@ soft_threshold_graph = function(data_matrix){
         text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
              labels=powers,cex=cex1,col="red");
         dev.off()
-        jpeg(file='mean_connectivity.jpeg', width=800, height=500)
+        #jpeg(file='mean_connectivity.jpeg', width=800, height=500)
+	print('mean connect')
+        pdf(file='mean_connectivity.pdf', width=8, height=5)
         # Mean connectivity as a function of the soft-thresholding power
         plot(sft$fitIndices[,1], sft$fitIndices[,5],
              xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
@@ -78,7 +107,12 @@ calc_diss_TOM = function(adjacency){
     #' adjacency ():
     #' Returns:
     #' dissTOM ():
+    print("calculating TOM from adjacency")
     TOM = TOMsimilarity(adjacency)
+    write.table(TOM, 'ModuleMembership_pvalue.tsv', sep='\t', row.names=FALSE, quote=FALSE)
+    print("checking peter's suggestion")
+    test_val = max(TOM - 1)
+    print(test_val)
     dissTOM = 1-TOM
     return(dissTOM)
 }
@@ -90,8 +124,11 @@ cluster_using_TOM = function(dissTOM){
         # Plot the resulting clustering tree (dendrogram)
         gtree_name = 'RawGeneTree'
         #sizeGrWindow(12,9)
-        ext = '.jpeg'
-        jpeg(file=paste(gtree_name, ext,  sep=''), width=800, height=600)
+        #ext = '.jpeg'
+        ext = '.pdf'
+        #jpeg(file=paste(gtree_name, ext,  sep=''), width=800, height=600)
+	      print('cluster using tom')
+        pdf(file=paste(gtree_name, ext,  sep=''), width=8, height=6)
         plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based dissimilarity",
              labels = FALSE, hang = 0.04)
         #0.04, look up guidehang
@@ -115,8 +152,11 @@ trim_and_color = function(geneTree, dissTOM){
         # Plot the dendrogram and colors underneath
         #sizeGrWindow(8,6)
         gtree_name = 'ColorGeneTree'
-        ext = '.jpeg'
-        jpeg(paste(gtree_name, ext,  sep=''), height=600, width=800)
+        #ext = '.jpeg'
+        ext = '.pdf'
+        #jpeg(paste(gtree_name, ext,  sep=''), height=600, width=800)
+	print('trim and color ')
+        pdf(paste(gtree_name, ext,  sep=''), height=6, width=8)
         plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
         		    dendroLabels = FALSE, hang = 0.03,
         		    addGuide = TRUE, guideHang = 0.05,
@@ -135,12 +175,13 @@ merging_similar_expression = function(working_data, dynamicColors, geneTree){
         #Cluster module eigengenes
         METree = hclust(as.dist(MEDiss), method = 'average')
         gtree_name = 'MergeColorGeneTree'
-        ext = '.jpeg'
-        jpeg(paste(gtree_name, ext,  sep=''), width=1100, height=600)
+        #ext = '.jpeg'
+        ext = '.pdf'
+        #jpeg(paste(gtree_name, ext,  sep=''), width=1100, height=600)
+	print('merging similar expression')
+        pdf(paste(gtree_name, ext,  sep=''), width=9, height=6)
         plot(METree, main = "Clustering of module eigengenes",
              xlab = "", sub = "")
-        dev.off()
-        plot.new()
         
         # Plot the cut line into the dendrogram
         # Corresponding to correlation of 0.75
@@ -152,9 +193,12 @@ merging_similar_expression = function(working_data, dynamicColors, geneTree){
         mergedColors = merge$colors
         # Eigengenes of the new merged modules:
         mergedMEs = merge$newMEs
+        dev.off()
         
         gtree_name = 'Merged_and_Raw_ColorGeneTree'
-        jpeg(paste(gtree_name, ext,  sep=''), width=800, height=600)
+        #jpeg(paste(gtree_name, ext,  sep=''), width=800, height=600)
+	print('merging similar expression 2')
+        pdf(paste(gtree_name, ext,  sep=''), width=8, height=6)
         plotDendroAndColors(geneTree, cbind(dynamicColors, mergedColors),
                             c("Dynamic Tree Cut", "Merged dynamic"),
                             dendroLabels = FALSE, hang = 0.03,
@@ -230,6 +274,7 @@ process = function(load_data_function, test_type, softpower){
         
   BlueberryData = load_data_function  # global variable for inspection
   # Set outdir
+  #setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/WGCNA_Data")
   setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/WGCNA_Data")
   transposed_BlueberryData = as.data.frame(t(subset(BlueberryData, select = -c(Gene_Name))))
   names(transposed_BlueberryData) = BlueberryData$Gene_Name
@@ -241,20 +286,21 @@ process = function(load_data_function, test_type, softpower){
   
   
 
-  # NOTE no longer calling the subset TPM function 
-  #working_data <<- Subset_BlueberryData
         
   # NOTE run this if you have not previously examined the network topology
   # and picked a soft thresholding power, command may take some time, and a lot of RAM
-  #soft_threshold_graph(working_data)
-  
+  soft_threshold_graph(working_data)
+
+  print('adjacency calculating')
   adjacency = adjacency(working_data, power=softpower)
+  print('done adjacency calculating')
   # To minimize effects of noise and spurious associations we transform adjacency matrix
   # into a Topological Overlap Matrix and calculate dissimilarity.
   # Turn adjacency into topological overlap
   # Fails unless you have an absurd amount of RAM, necessary to move to HPCC at this point
+  	print('disstom now')
 	dissTOM <<- calc_diss_TOM(adjacency)
-  rm(adjacency)  # clear space
+  	rm(adjacency)  # clear space
 
 	geneTree <<- cluster_using_TOM(dissTOM)
 
@@ -280,4 +326,10 @@ process = function(load_data_function, test_type, softpower){
 # Choose a soft power of 2 because that was best for the ALL set  CHECK THIS
 # Choose a soft power of 6 because that was best for the SINGLE set  CHECK THIS
 # Choose a soft power of 3 because that was best for the all test set
-process(load_all_test(), 'test40k', 3)
+
+#process(load_all_hap_hpcc(), 'All_Genes', 3)
+#print('80')
+#process(load_80(), '80', 3)
+#process(load_all_test(), 'test', 3)
+print('real_run')
+process(load_all_hap_hpcc(), 'All_Genes', 3)

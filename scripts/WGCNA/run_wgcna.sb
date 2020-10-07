@@ -1,23 +1,23 @@
 #!/bin/bash -login
 
-#SBATCH -J wgcna_blueberry
-#SBATCH --time=01:00:00
+#SBATCH -J mkl_wgcna
+#SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=6
-#SBATCH --mem-per-cpu=30G
+#SBATCH --mem-per-cpu=50G
+cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Data/
 
 # Load Modules
 module purge
-module load GCC/8.3.0
-module load OpenMPI/3.1.4
-module load R/4.0.2
+module load intel/2019b R/4.0.0
 
 # BODY
 begin=`date +%s`
+echo "mkl"
 echo $HOSTNAME
 echo "My Task ID:" $SLURM_ARRAY_TASK_ID
 
 # source activate wgcna
-cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Networking/scripts/WGCNA/
+cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/scripts/WGCNA/
 
 Rscript Blueberry_WGCNA.R
 
