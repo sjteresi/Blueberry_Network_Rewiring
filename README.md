@@ -35,7 +35,7 @@ Please install **Pip** so that you may easily install Python packages. Then use 
 This block of work has both non-code tasks and code tasks. First, I ran the blueberry genome through CoGe to perform a syntelog search. Second, I supplement the results with a BLAST search.
 
 ### Running SynMap:
-This section describes the methods to run [SynMap](https://genomevolution.org/CoGe/SynMap.pl) on CoGe. I ran SynMap with [default options](https://genomevolution.org/wiki/index.php/SynMap). Here is the [link](https://genomevolution.org/r/1ejoj) to regenerate the analysis on CoGe.
+This section describes the methods to run [SynMap](https://genomevolution.org/CoGe/SynMap.pl) on CoGe. I ran SynMap with mostly [default options](https://genomevolution.org/wiki/index.php/SynMap), I did change one option: under *Merge Syntenic Blocks* I set it to `Quota Align Merge`. Here is the [link](https://genomevolution.org/r/1ejoj) to regenerate the analysis on CoGe.
 
 ### Running BLAST:
 We are doing this step to identify homologs that may have been missed using a synteny-based approach. Genes that could have been missed by the synteny search include single-gene transpositions (and others). We are going to use a BLAST database of protein predictions.
