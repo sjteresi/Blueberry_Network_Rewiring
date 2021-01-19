@@ -96,6 +96,10 @@ def save_missing_color_groups(color, dataframe, output_dir):
 
 
 def drop_duplicate_AT_genes(modules_w_AT):
+    """
+    Removes all duplicate values for a given row, by default keeps 1 entry,
+    the first occurrence of that value.
+    """
     modules_w_AT.drop_duplicates(subset=["Arabidopsis_Gene"], inplace=True)
     return modules_w_AT
 
@@ -147,15 +151,12 @@ def process(genes_w_module_groups, gene_pairs, diffex_orth_dir, output_dir):
 
     grouped_modules = subset_module_colors(modules_w_AT)
     for color, frame in grouped_modules:
-    # NOTE removed the use of:
-    # drop_duplicate_AT_genes(modules_w_AT):
-    # We keep duplicate Arabidosis genes in the module.
-    # In this way Alder can later examine the files.
-    frame_copy = frame.copy(deep=True)
-    save_color_groups(
-    color, frame_copy, os.path.join(output_dir, "WGCNA_Data", "modulecolors_AT")
-    )
-
+        frame = drop_duplicate_AT_genes(frame)  # comment this if duplicate
+        # genes are wanted in the module
+        frame_copy = frame.copy(deep=True)
+        save_color_groups(
+            color, frame_copy, os.path.join(output_dir, "WGCNA_Data", "modulecolors_AT")
+        )
 
 
 if __name__ == "__main__":
