@@ -50,8 +50,8 @@ load_60 = function(){
 load_all_test = function(){
 	# Read in the blueberry data set
 	# Each row is a gene and each column is a library.
-  	#setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
-  	setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/TPM")
+  	setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
+  	#setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/TPM")
 	AllHap_BlueberryData = read.csv("Blueberry_TPM_all40.tsv", header=TRUE, sep='\t')
 	return(AllHap_BlueberryData)
   
@@ -274,8 +274,8 @@ process = function(load_data_function, test_type, softpower){
         
   BlueberryData = load_data_function  # global variable for inspection
   # Set outdir
-  #setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/WGCNA_Data")
-  setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/WGCNA_Data")
+  setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/WGCNA_Data")
+  #setwd("/home/scott/Documents/Uni/Research/Projects/Blueberry_Data/WGCNA_Data")
   transposed_BlueberryData = as.data.frame(t(subset(BlueberryData, select = -c(Gene_Name))))
   names(transposed_BlueberryData) = BlueberryData$Gene_Name
   rownames(transposed_BlueberryData) = names(subset(BlueberryData, select = -c(Gene_Name)))
