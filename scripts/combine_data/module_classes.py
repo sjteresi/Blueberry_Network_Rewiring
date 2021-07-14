@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class EnrichmentFactory:
     @staticmethod
     def build_data(file_string):
-        split_string = files_string.split(".")
+        split_string = file_string.split(".")
         module_type = split_string[0]
         type_name = split_string[1]
         file_type = split_string[2]
@@ -13,7 +13,7 @@ class EnrichmentFactory:
             raise NotImplementedError("File type is %s instead of tsv" % type_name)
         if type_name == "Component":
             return Component(module_type, file_string)
-        if type_name == "Smart":
+        if type_name == "SMART":
             return Smart(module_type, file_string)
         if type_name == "Keyword":
             return Keyword(module_type, file_string)
@@ -40,7 +40,7 @@ class EnrichmentFactory:
 
 class EnrichmentData(ABC):
     PATH = ""
-
+    
     @abstractmethod
     def csv_in():
         # reads this type of csv
@@ -60,7 +60,7 @@ class Component(EnrichmentData):
         self.module = module
         self.file = file
         self.csv_in()
-
+        self.type = "Component"
     def csv_in(self):
         self.df = pd.read_csv(EnrichmentData.PATH + self.file, delimiter="\t")
         column1 = (
@@ -272,4 +272,4 @@ class KEGG(EnrichmentData):
         self.df[column2] = self.df[column2].str.split(",")
 
     def csv_out(self):
-        return 0
+       return 0
