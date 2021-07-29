@@ -13,7 +13,7 @@ PATH = "/home/alder/Documents/research/Blueberry_Data/Enrichment_Data/Gene_Analy
 
 modules = []
 for directory in os.listdir(PATH):
-    EnrichmentData.PATH = PATH + directory + "/"
+    EnrichmentFactory.PATH = PATH + directory + "/"
     for file_ in os.listdir(PATH+directory):
         modules.append(EnrichmentFactory.build_data(file_) )
 
