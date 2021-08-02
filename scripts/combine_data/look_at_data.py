@@ -32,8 +32,31 @@ def module_data(data):
     Unique_Terms.write(string_of_genes)
     Unique_Terms.close()
 
-#Unique_Terms = open("Unique_Terms.txt",'w')
-#Gene_Counts = {}
+#Makes a file with the term description and number of times shown up.
+def term_data(list_of_files,file_type = "Process"):
+    #First, we make the different containers for our data
+    Unique_Terms = open("term_data.txt",'w')
+    Term_Counts = {}
+    #Second, we fill in all our data
+    for data in list_of_files:
+        if data.file_type!= file_type:
+            #This skips the current file if it isn't a process file.
+            continue
+        for desc in data.df["term description"]:
+            if desc not in Term_Counts:
+                Term_Counts[desc] = 1
+            else:
+                Term_Counts[desc] += 1
+    #Third, we sort our data
+    Sorted_Unique_Terms = sortByValue(Term_Counts)
+    #Lastly, we write our data
+    string_of_unique_terms = ""
+    for desc in reversed(Sorted_Unique_Terms):
+        string_of_unique_terms += desc[0] + ":\t" + str(desc[1]) + "\n"
+    Unique_Terms.write(string_of_unique_terms)
+    Unique_Terms.close()
+
+term_data(modules)
 for data in modules:
     #We only want to work with the Process files.
     if data.file_type != "Process":
