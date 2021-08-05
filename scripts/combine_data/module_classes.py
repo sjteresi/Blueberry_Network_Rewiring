@@ -1,6 +1,8 @@
 import pandas as pd
 from abc import ABC, abstractmethod
 
+def fix_ID(str1):
+    return str1.split('.')[1]
 
 class EnrichmentFactory:
     PATH = ""
@@ -24,12 +26,11 @@ class EnrichmentData():
     def csv_in(self):
         self.df = pd.read_csv(EnrichmentFactory.PATH + self.file_string, delimiter="\t")
         self.df = self.df.loc[self.df["false discovery rate"] < .05] #MAGIC: Column name and fdr cutoff.
-        column1 = (
-            "matching proteins in your network (IDs)"  # MAGIC: Column name from file.
-        )
+        column1 =  "matching proteins in your network (IDs)"  # MAGIC: Column name from file.
         column2 = "matching proteins in your network (labels)"  # MAGIC: Column name from file.
         self.df[column1] = self.df[column1].str.split(",")
         self.df[column2] = self.df[column2].str.split(",")
+        self.df[column2] = self.df[column1].apply(lambda x: [fix_ID(i) for i in x])
     def csv_out(self):
         # not sure about this one
         return 0

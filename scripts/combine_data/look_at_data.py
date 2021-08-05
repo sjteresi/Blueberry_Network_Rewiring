@@ -1,5 +1,6 @@
 # This file is to analyze the process file. Both as a whole, and within
 # individual modules.
+import os
 from combine_data import modules
 """
 Each data has:
@@ -16,8 +17,10 @@ def sortByValue(my_dict):
     return sortedByValue
 
 # Makes a file listing the different proteins found in a module.
-def module_data(data):
-    Unique_Terms = open("genes_" + data.module + "_" + data.file_type + ".txt",'w')
+def module_data(data, folder = "Module_Data/"):
+    if os.path.exists(folder) == False:
+        os.mkdir(folder)
+    Unique_Terms = open(folder + "genes_" + data.module + "_" + data.file_type + ".txt",'w')
     Gene_Counts = {}
     for genes in data.df["matching proteins in your network (labels)"]:
         for gene in genes:
