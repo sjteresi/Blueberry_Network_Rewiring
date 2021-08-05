@@ -28,6 +28,7 @@ def create_df(folder):
     for df in df_list:
         total_df = total_df.join(df)
     total_df = total_df.fillna(0) #Replaces the genes that didn't exist in one df with 0s.
+    total_df.columns = [x.split("_")[0] for x in total_df.columns]
     return total_df
 
 def save_df(df):
@@ -41,6 +42,7 @@ def open_df():
 folder = "/home/alder/Documents/research/Blueberry_Data/WGCNA_Data/modulecolors_AT_w_duplicates"
 dataframe = create_df(folder)
 #save_df(dataframe)
-df = open_df()
+#df = open_df()
 #print(df)
-print(dataframe.head())
+#print(dataframe["bisque4"].sort_value())
+print(dataframe.sum())

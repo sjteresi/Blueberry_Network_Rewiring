@@ -22,7 +22,7 @@ def module_data(data, folder = "Module_Data/"):
         os.mkdir(folder)
     Unique_Terms = open(folder + "genes_" + data.module + "_" + data.file_type + ".txt",'w')
     Gene_Counts = {}
-    for genes in data.df["matching proteins in your network (labels)"]:
+    for genes in data.df["matching proteins in your network (IDs)"]:
         for gene in genes:
             if gene not in Gene_Counts:
                 Gene_Counts[gene] = 1

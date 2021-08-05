@@ -17,11 +17,3 @@ for directory in os.listdir(PATH):
     for file_ in os.listdir(PATH+directory):
         modules.append(EnrichmentFactory.build_data(file_) )
 
-
-
-
-
-
-
-
-
