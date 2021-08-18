@@ -13,16 +13,23 @@ Each data has:
 #Takes in a dictionary, sorts it by the value from least to greatest, then
 #returns an array of lists.
 def sortByValue(my_dict):
+    """
+    This allows me to sort a dictionary. It doesn't *really* sort a
+    dictionary, but it basically does.
+    """
     sortedByValue = sorted(my_dict.items(), key = lambda t:t[1])
     return sortedByValue
 
 # Makes a file listing the different proteins found in a module.
 def module_data(data, folder = "Module_Data/"):
-    if os.path.exists(folder) == False:
-        os.mkdir(folder)
+    if os.path.exists(folder) == False: #We gotta create the folder if it
+        os.mkdir(folder)                #doesn't exist.
+    #Creates a file in the folder we want 
     Unique_Terms = open(folder + "genes_" + data.module + "_" + data.file_type + ".txt",'w')
     Gene_Counts = {}
     for genes in data.df["matching proteins in your network (IDs)"]:
+        # Code below counts up all the genes in each row of the module.
+        # Not the most efficient, but higher efficiency is un-needed.
         for gene in genes:
             if gene not in Gene_Counts:
                 Gene_Counts[gene] = 1
@@ -68,22 +75,3 @@ for data in modules:
     #The code below is supposed to count how many times any given gene shows up.
     module_data(data)
 
-
-    """
-    for genes in data.df["matching proteins in your network (labels)"]:
-        for gene in genes:
-            if gene not in Gene_Counts:
-                Gene_Counts[gene] = 1
-            else:
-                Gene_Counts[gene] += 1
-    """
-
-"""
-Sorted_Gene_Counts = sortByValue(Gene_Counts)
-string_of_genes = ""
-for Gene in reversed(Sorted_Gene_Counts):
-    string_of_genes += Gene[0] + ": " + str(Gene[1]) + "\n"
-
-Unique_Terms.write(string_of_genes)
-Unique_Terms.close()
-"""

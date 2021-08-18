@@ -1,5 +1,4 @@
 import pandas as pd
-from abc import ABC, abstractmethod
 
 def fix_ID(str1):
     return str1.split('.')[1]
