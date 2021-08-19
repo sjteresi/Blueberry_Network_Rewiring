@@ -8,12 +8,12 @@ __author__ = "Scott Teresi, Alder Fulton"
 
 # IMPORTS go here
 import os
-from module_classes import * 
+from module_classes import *
+
 PATH = "../../../Blueberry_Data/Enrichment_Data/Gene_Analysis/"
 
 modules = []
 for directory in os.listdir(PATH):
     EnrichmentFactory.PATH = PATH + directory + "/"
-    for file_ in os.listdir(PATH+directory):
-        modules.append(EnrichmentFactory.build_data(file_) )
-
+    for file_ in os.listdir(PATH + directory):
+        modules.append(EnrichmentFactory.build_data(file_))
