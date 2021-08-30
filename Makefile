@@ -7,6 +7,7 @@ DEV_DATA := $(ROOT_DIR)/../Blueberry_Data
 DEV_SYNTELOGS := $(DEV_DATA)/AtBB/data_input/synmap_out_8_12_2020.txt
 DEV_HOMOLOGS := $(DEV_DATA)/AtBB/data_input/At-Blueberry.blast
 DEV_DIFFEXDIR := $(DEV_DATA)/Diff_Ex/EdgeR_Output/
+DEV_GENE_ANALYSIS := $(DEV_DATA)/Enrichment_Data/Gene_Analysis/
 
 DEV_GENOME := $(DEV_DATA)/Genome/V_corymbosum_v1.0_geneModels.gff
 DEV_ORTHOLOGY := $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv
@@ -29,6 +30,10 @@ at_bb_singlefdr:                ## execute orthology code with our data
 # Gene Stats
 gene_stats_all:    # execute gene stats
 	$(ROOT_DIR)/scripts/gene_stats/operations.py $(DEV_GENOME) $(DEV_ORTHOLOGY)
+
+# Combine Data
+look_at_data:
+	$(ROOT_DIR)/scripts/combine_data/look_at_data.py $(DEV_GENE_ANALYSIS) $(ROOT_DIR)/scripts/combine_data/Module_Data
 
 #----------------------------------------#
 

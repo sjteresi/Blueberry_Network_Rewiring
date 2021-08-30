@@ -74,12 +74,23 @@ def term_data(list_of_files, file_type="Process"):
     Unique_Terms.write(string_of_unique_terms)
     Unique_Terms.close()
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="...")
+    parser.add_argument("generation_path", type = str, help = """Path to the
+                        folder used for generatng the classes.""")
+    parser.add_argument("output_folder",type = str, help = """Path to the
+                        folder that the data will be outputted to."""   )
+    args = parser.parse_args()
+    generation_path = args.generation_path
+    output_folder = args.output_folder
 
-term_data(modules)  # TODO edit?
-for data in modules:  # TODO edit?
-    # We only want to work with the Process files.
-    if data.file_type != "Process":
-        continue
-    # Loops through every file. One file at a time.
-    # The code below is supposed to count how many times any given gene shows up.
-    module_data(data)
+    modules = function_to_generate_all_modules(generation_path):
+
+    #term_data(modules)  # TODO edit?
+    for data in modules:  # TODO edit?
+        # We only want to work with the Process files.
+        if data.file_type != "Process":
+            continue
+        # Loops through every file. One file at a time.
+        # The code below is supposed to count how many times any given gene shows up.
+        module_data(data, output_folder)
