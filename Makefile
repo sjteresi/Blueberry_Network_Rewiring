@@ -11,6 +11,8 @@ DEV_DIFFEXDIR := $(DEV_DATA)/Diff_Ex/EdgeR_Output/
 DEV_GENOME := $(DEV_DATA)/Genome/V_corymbosum_v1.0_geneModels.gff
 DEV_ORTHOLOGY := $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv
 
+DEV_RESULTS := $(DEV_DATA)/results
+
 .PHONY: dev help
 
 # All Hap ATBB
@@ -36,6 +38,12 @@ gene_stats_all:    # execute gene stats
 
 
 fpkm:                ## execute fpkm code with our data
+
+
+generate_exp_table_melanie:
+	mkdir -p $(DEV_RESULTS)/melanie_exp_syn_table
+	python3 $(ROOT_DIR)/scripts/exp_table_melanie.py $(DEV_DATA)/FPKM/Blueberry_FPKM_All.tsv $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv $(DEV_RESULTS)/melanie_exp_syn_table
+
 
 help:               ## Show this help.
 	fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
