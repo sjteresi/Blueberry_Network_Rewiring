@@ -15,11 +15,8 @@ import coloredlogs
 
 
 from import_syntelogs import import_syntelogs
-from import_syntelogs import Syntelog_Data
 from import_homologs import import_homologs
-from import_homologs import Homolog_Data
 from merge_homo_synt import merge_homo_synt
-from merge_homo_synt import Merged_Data
 from import_diff_exp import ExpData
 from union_data import Union_Data
 
@@ -35,55 +32,51 @@ def process(
     # Import the synteny data from raw file
     logger.info("Importing syntelogs: %s" % syntelog_input_file)
     syntelogs = import_syntelogs(syntelog_input_file)
-
-    # Wrap the data
-    logger.debug("Wrapping Syntelog_Data...")
-    instance_Syntelog_Data = Syntelog_Data(syntelogs)
-    file_to_save = os.path.join(data_output_path, "set_syntelogs.tsv")
+    # Save syntelog data to disk
+    # MAGIC filename
+    file_to_save = os.path.join(data_output_path, "Filtered_Syntelogs.tsv")
     logger.info("Writing syntelog data to disk: %s" % file_to_save)
-    instance_Syntelog_Data.save_to_disk(file_to_save)
+    syntelogs.to_csv(file_to_save, sep="\t", header=True, index=False)
 
     # Import the homology (BLAST) data from raw file
     logger.info("Importing BLAST results: %s" % homolog_input_file)
     homologs = import_homologs(homolog_input_file)
-
-    # Wrap the data
-    logger.debug("Wrapping Homolog_Data...")
-    instance_Homolog_Data = Homolog_Data(homologs)
-    # Save to disk
-    file_to_save = os.path.join(data_output_path, "set_homologs.tsv")
+    # Save homolog data to disk
+    # MAGIC filename
+    file_to_save = os.path.join(data_output_path, "Filtered_Homologs.tsv")
     logger.info("Writing homolog data to disk: %s" % file_to_save)
-    instance_Homolog_Data.save_to_disk(file_to_save)
+    homologs.to_csv(file_to_save, sep="\t", header=True, index=False)
 
     # Merge the synteny and homology data
-    logger.debug("Merging the data...")
-    merged_all = merge_homo_synt(instance_Syntelog_Data, instance_Homolog_Data)
-
-    # Wrap the data
-    logger.debug("Wrapping the merged data...")
-    instance_Merged_Data = Merged_Data(merged_all)
-    # Save to disk
-    file_to_save = os.path.join(data_output_path, "merged_homo_and_syn.tsv")
+    logger.info("Merging the data...")
+    merged_all = merge_homo_synt(syntelogs, homologs)
+    # Save synteny/homology data to disk
+    # MAGIC filename
+    file_to_save = os.path.join(data_output_path, "Synteny_Homology_Table.tsv")
     logger.info("Writing merged data to disk: %s" % file_to_save)
-    instance_Merged_Data.save_to_disk(file_to_save)
-    # synteny_count, blast_count = instance_Merged_Data.total_count_summary
+    merged_all.to_csv(file_to_save, sep="\t", header=True, index=False)
 
     # Get differential expression data
-    logger.info("Getting the differential expression data...")
+    logger.info("Loading the differential expression data...")
     instance_Exp_Data = ExpData(diff_exp_dir)
 
+    # NOTE union portion of code now
     # Get union of blueberry genes between diff exp and synteny/homology,
     # and thus the corresponding Arabidopsis gene
+    # I.E determine which blueberry genes of the differential expression data
+    # have an Arabidopsis ortholog and create a new set of differential
+    # expression data files, now with the arabidopsis ortholog.
+
     logger.info("Find the union between the diff exp data and the merged data")
     union_data_output_dir = os.path.join(
         data_output_path, "Union", haplotype, stat_type
     )
     if not os.path.exists(union_data_output_dir):
         os.makedirs(union_data_output_dir)
-    union_obj = Union_Data(instance_Merged_Data, instance_Exp_Data)
+    union_obj = Union_Data(merged_all, instance_Exp_Data)
 
     # Save results to disk
-    logger.info("Saving union results to disk: %s" % union_data_output_dir)
+    # logger.info("Saving union results to disk: %s" % union_data_output_dir)
     union_obj.save_union(union_data_output_dir)
     union_obj.save_summary_union(union_data_output_dir)
 
@@ -101,11 +94,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "diff_ex_dir", type=str, help="parent path of input directory",
+        "diff_ex_dir",
+        type=str,
+        help="parent path of input directory",
     )
 
     parser.add_argument(
-        "stat_type", type=str, help="what type of error correction did you use",
+        "stat_type",
+        type=str,
+        help="what type of error correction did you use",
     )
     parser.add_argument("haplotype", type=str, help="single or all dataset")
     parser.add_argument(

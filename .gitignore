@@ -1,20 +1,7 @@
-# Exclude tex
-*.tex
-*.log
+# Exclude
 *.pyc
 
-# Exclude pycache folder
-Code/__pycache__/*
 
-# Exclude cache folder
-_cache/
-
-# Ignore the folder
-Grant/*
-Code_and_Data/Diff_Ex/*
-
-# Ignore data folders but keep the folder
-Code_and_Data/data_input/*
-Code_and_Data/data_output/*
-!Code_and_Data/data_input/.gitkeep
-!Code_and_Data/data_output/.gitkeep
+# Ignore data but keep the directory
+results/*
+!results/.gitkeep

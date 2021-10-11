@@ -78,7 +78,8 @@ def import_syntelogs(syntelog_input_file):
     gene_data = gene_data.loc[gene_data["E_Value"] < 0.05]
 
     gene_data.drop(
-        columns=["OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"], inplace=True,
+        columns=["OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"],
+        inplace=True,
     )
 
     # Add column with identifier so we can later see what source we derived the
@@ -90,41 +91,3 @@ def import_syntelogs(syntelog_input_file):
     gene_data = gene_data.loc[gene_data.groupby("Blueberry")["E_Value"].idxmin()]
 
     return gene_data
-
-
-class Syntelog_Data(object):
-    """
-    Wrappers for input data, multiple syntelog pairs.
-
-    Used to provide a common interface and fast calculations with numpy.
-    """
-
-    def __init__(self, syntelog_dataframe, logger=None):
-        """Initialize.
-
-        Args:
-            syntelog_dataframe (DataFrame): syntelog data frame.
-        """
-        self._logger = logger or logging.getLogger(__name__)
-        self.dataframe = syntelog_dataframe
-
-    def save_to_disk(self, filename):
-        """
-        Save the syntelogs to disk in a 2-column format.
-        Arabidopsis in left-hand column, blueberry in right-hand column.
-
-        Args:
-            filename (str): path for the file
-        """
-        # self.to_write = self.dataframe.copy(deep=True)
-        # self.to_write.drop(
-        # columns=["E_Value", "OrgA_Chromosome", "OrgB_Chromosome", "Diagonal_Score"],
-        # inplace=True,
-        # )
-        self.dataframe.to_csv(filename, sep="\t", header=True, index=False)
-
-    def __repr__(self):
-        """
-        String representation for developer.
-        """
-        return "Syntelog_Data{}".format(self.dataframe)

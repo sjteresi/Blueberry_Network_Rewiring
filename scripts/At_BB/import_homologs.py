@@ -69,37 +69,3 @@ def import_homologs(homolog_input_file):
     gene_data["Point_of_Origin"] = "BLAST"
 
     return gene_data
-
-
-class Homolog_Data(object):
-    """
-    Wrappers for input data, multiple homolog pairs.
-
-    Used to provide a common interface and fast calculations with numpy.
-
-    """
-
-    def __init__(self, homolog_dataframe, logger=None):
-        """Initialize.
-
-        Args:
-            homolog_dataframe (DataFrame): homolog data frame.
-        """
-        self._logger = logger or logging.getLogger(__name__)
-        self.dataframe = homolog_dataframe
-
-    def save_to_disk(self, filename):
-        """
-        Save the syntelogs to disk in a 2-column format.
-        Arabidopsis in left-hand column, blueberry in right-hand column.
-
-        Args:
-            filename (str): path for the file
-        """
-        self.dataframe.to_csv(filename, sep="\t", header=True, index=False)
-
-    def __repr__(self):
-        """
-        String representation for developer.
-        """
-        return "Homolog_Data{}".format(self.dataframe)
