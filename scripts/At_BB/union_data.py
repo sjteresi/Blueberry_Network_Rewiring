@@ -8,8 +8,7 @@ import os
 
 
 class Union_Data(object):
-    """
-    """
+    """ """
 
     def __init__(self, merged_data, exp_data, logger=None):
         """Initialize.
@@ -20,16 +19,14 @@ class Union_Data(object):
             output_dir (str):
         """
         self._logger = logger or logging.getLogger(__name__)
-        self.merged = merged_data.dataframe
+        self.merged = merged_data
         self.exp_dict = exp_data.exp_dict
         self.union_w_dups_dict = self.find_union(True)
         self.union_no_dups_dict = self.find_union(False)
 
     @staticmethod
     def verify_dir(input_filename, output_dir):
-        """
-
-        """
+        """ """
         the_path = input_filename.replace("_Direction", "")
         if not os.path.exists(os.path.join(output_dir, the_path)):
             os.makedirs(os.path.join(output_dir, the_path))
@@ -47,7 +44,10 @@ class Union_Data(object):
             )
             self._logger.info("Saving the union data at: %s" % loc)
             sig_genes["Arabidopsis_Gene"].to_csv(
-                loc, sep="\t", header=True, index=False,
+                loc,
+                sep="\t",
+                header=True,
+                index=False,
             )
 
         for the_filename, sig_genes in self.union_w_dups_dict.items():
@@ -57,7 +57,10 @@ class Union_Data(object):
             )
             self._logger.info("Saving the union data at: %s" % loc)
             sig_genes["Arabidopsis_Gene"].to_csv(
-                loc, sep="\t", header=True, index=False,
+                loc,
+                sep="\t",
+                header=True,
+                index=False,
             )
 
     def save_summary_union(self, output_dir):
@@ -106,19 +109,17 @@ class Union_Data(object):
         for the_filename, sig_genes in self.exp_dict.items():
             the_filename = the_filename.replace("_Direction", "")
             diffexp_genes_list = sig_genes.Gene_Name.tolist()
+
             AT_union = self.merged[
                 self.merged["Blueberry_Gene"].isin(diffexp_genes_list)
             ]
+            # NOTE sort by E_Value so that when we do dorp duplicates, we can
+            # keep the first, which is the best score (most smallest).
+            AT_union = AT_union.sort_values(by=["E_Value"])
             if dups:
                 the_union_dict[the_filename] = AT_union
             else:
                 the_union_dict[the_filename] = AT_union.drop_duplicates(
-                    subset=["Arabidopsis_Gene"]
+                    subset=["Arabidopsis_Gene"], keep="first"
                 )
         return the_union_dict
-
-    def __repr__(self):
-        """
-        String representation for developer.
-        """
-        return "Merged_Data{}".format(self.dataframe)
