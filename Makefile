@@ -39,6 +39,14 @@ create_diff_ex_tables:
 	python $(ROOT_DIR)/scripts/diff_ex_tables/diff_ex_tables.py $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ $(DEV_RESULTS)/Differential_Expression_Tables
 
 
+# Work on GO:
+# Distill the raw gene universe /  GO file down into a format for TopGO
+GO:
+	mkdir -p $(DEV_RESULTS)/GO
+	python $(ROOT_DIR)/scripts/TopGO/generate_gene_w_GO_term.py $(DEV_DATA)/GO/ATH_GO_GOSLIM.txt $(DEV_RESULTS)/GO
+
+topGO:
+	Rscript $(ROOT_DIR)/scripts/TopGO/topGO_blueberry.R $(DEV_DATA)/WGCNA_Data/modulecolors_AT $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv $(DEV_RESULTS)/GO
 
 # Gene Stats
 gene_stats_all:    # execute gene stats
