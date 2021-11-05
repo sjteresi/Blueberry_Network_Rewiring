@@ -34,6 +34,12 @@ module_conversion:
 	mkdir -p $(DEV_RESULTS)/Modules
 	python $(ROOT_DIR)/scripts/modules/filter_modules.py $(DEV_DATA)/WGCNA_Data/Final_WGCNA/Genes_and_ModuleColors.tsv $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv $(DEV_RESULTS)/Modules
 
+create_diff_ex_tables:
+	mkdir -p $(DEV_RESULTS)/Differential_Expression_Tables/
+	python $(ROOT_DIR)/scripts/diff_ex_tables/diff_ex_tables.py $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ $(DEV_RESULTS)/Differential_Expression_Tables
+
+
+
 # Gene Stats
 gene_stats_all:    # execute gene stats
 	$(ROOT_DIR)/scripts/gene_stats/operations.py $(DEV_GENOME) $(DEV_ORTHOLOGY)
