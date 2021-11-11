@@ -48,6 +48,19 @@ GO:
 topGO:
 	Rscript $(ROOT_DIR)/scripts/TopGO/topGO_blueberry.R $(DEV_DATA)/WGCNA_Data/modulecolors_AT $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv $(DEV_RESULTS)/GO
 
+#----------------------------------------#
+# Master summary table
+create_summary_table:
+	mkdir -p $(DEV_RESULTS)/Summary_Diff_Ex_Modules
+	python $(ROOT_DIR)/scripts/summary_table.py \
+	       $(DEV_DATA)/WGCNA_Data/Final_WGCNA/Genes_and_ModuleColors.tsv \
+	       $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv \
+	       $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ \
+	       $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv \
+	       $(DEV_RESULTS)/Summary_Diff_Ex_Modules
+
+
+#----------------------------------------#
 # Gene Stats
 gene_stats_all:    # execute gene stats
 	$(ROOT_DIR)/scripts/gene_stats/operations.py $(DEV_GENOME) $(DEV_ORTHOLOGY)
