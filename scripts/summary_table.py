@@ -13,16 +13,106 @@ import logging
 import pandas as pd
 import re
 import os
+from functools import reduce
 
-# TODO create function to read genes_and_module_colors file
+from scripts.modules.filter_modules import read_synteny_homology_table
+from scripts.modules.filter_modules import read_gene_modules_table
 
-# TODO create function to read synteny_homology_table file
+# def read_genes_and_module_colors(input_file):
+# data = pd.read_csv(input_file, sep="\t", header="infer")
+# data.rename(
+# columns={"Gene_Names": "Blueberry_Gene", "moduleColor": "Module_Color"},
+# inplace=True,
+# )
+# return data
 
-# TODO create function to iterate through diff_ex_dir and read direction files
 
-# TODO create function to read arabidopsis_go_terms file
+# def read_synteny_homology_table(input_file):
+# data = pd.read_csv(input_file, sep="\t", header="infer")
+# return data
+
+
+def read_diff_ex_direction_directory(input_directory):
+    only_direction_files = [
+        os.path.join(input_directory, f)
+        for f in os.listdir(input_directory)
+        if (os.path.isfile(os.path.join(input_directory, f))) and ("_Summary" not in f)
+    ]
+    comparison_groupings = [
+        os.path.basename(os.path.splitext(f)[0]).rstrip("_Direction")
+        for f in only_direction_files
+    ]
+
+    # NB sort alphabetically so we can zip and then pair up
+    only_direction_files.sort()
+    comparison_groupings.sort()
+
+    table_list = []
+    for direction_data, comparison_group in zip(
+        only_direction_files, comparison_groupings
+    ):
+        table = read_diff_ex_direction_file(direction_data, comparison_group)
+        table_list.append(table)
+    return table_list
+
+
+def read_diff_ex_direction_file(input_file, comparison_group):
+    data = pd.read_csv(input_file, sep="\t", header="infer")
+    data.rename(
+        columns={
+            "Gene_Name": "Blueberry_Gene",
+            "Direction_Differentially_Regulated": comparison_group,
+        },
+        inplace=True,
+    )
+    return data
+
+
+def read_arabidopsis_go_table(input_file):
+    data = pd.read_csv(
+        input_file, sep="\t", header=None, names=["Arabidopsis_Gene", "GO_Terms"]
+    )
+    data["GO_Terms"] = [x.replace(" ", "").split(",") for x in data["GO_Terms"]]
+    return data
+
+
+# TODO consider adding TPM/FPKM?
 
 # TODO create function to merge all the datasets
+def merge_dataframes(
+    synteny_homology_data,
+    arabidopsis_go_data,
+    blueberry_genes_and_module_colors,
+    diff_ex_panda_list,
+):
+
+    # NOTE merge blueberry gene / module color with blueberry gene / diff ex
+    # status
+    all_diff_ex_merged = reduce(
+        lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
+        diff_ex_panda_list,
+    )
+    merged = pd.merge(
+        all_diff_ex_merged,
+        blueberry_genes_and_module_colors,
+        on="Blueberry_Gene",
+        how="outer",
+    )
+
+    # NOTE merge in synteny homology data to get Arabidopsis gene, some
+    # Arabidopsis genes will repeat, and there are some blueberry genes from
+    # scaffolds that aren't the main chromosomes. They will have NAs in the
+    # diff ex and module set.
+    # This has all of the blueberry genes, no duplicates
+    # SQL full outer join
+    merged = pd.merge(merged, synteny_homology_data, on="Blueberry_Gene", how="outer")
+
+    # NOTE get the GO data for an Arabidopsis gene only if it is already in the
+    # data table, SQL left outer join
+    complete = pd.merge(merged, arabidopsis_go_data, on="Arabidopsis_Gene", how="left")
+
+    return complete
+
 
 # TODO create function to save final output or perform one-liner in main
 
@@ -55,4 +145,23 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
 
-    # NOTE code from here
+    print()
+    print()
+    print()
+
+    synteny_homology_data = read_synteny_homology_table(args.synteny_homology_table)
+    arabidopsis_go_data = read_arabidopsis_go_table(args.arabidopsis_go_terms)
+    blueberry_genes_and_module_colors = read_gene_modules_table(
+        args.genes_and_module_colors
+    )
+    diff_ex_panda_list = read_diff_ex_direction_directory(args.diff_ex_dir)
+    # NB all primary datafiles now read in
+
+    complete = merge_dataframes(
+        synteny_homology_data,
+        arabidopsis_go_data,
+        blueberry_genes_and_module_colors,
+        diff_ex_panda_list,
+    )
+    # TODO get filename to save
+    complete.to_csv("test.tsv", sep="\t", header=True, index=False)
