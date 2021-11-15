@@ -57,6 +57,7 @@ create_summary_table:
 	       $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv \
 	       $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv \
+	       $(DEV_DATA)/TPM/Blueberry_TPM_All.tsv \
 	       $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 
 

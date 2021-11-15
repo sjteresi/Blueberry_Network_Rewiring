@@ -2,7 +2,7 @@
 
 """
 Create the union of dataframes of differentially expressed genes, Arabidopsis
-ortholog, and gene network module identity.
+ortholog, Arabidopsis GO term, and blueberry gene network module identity.
 """
 
 __author__ = "Scott Teresi"
@@ -18,18 +18,11 @@ from functools import reduce
 from scripts.modules.filter_modules import read_synteny_homology_table
 from scripts.modules.filter_modules import read_gene_modules_table
 
-# def read_genes_and_module_colors(input_file):
-# data = pd.read_csv(input_file, sep="\t", header="infer")
-# data.rename(
-# columns={"Gene_Names": "Blueberry_Gene", "moduleColor": "Module_Color"},
-# inplace=True,
-# )
-# return data
 
-
-# def read_synteny_homology_table(input_file):
-# data = pd.read_csv(input_file, sep="\t", header="infer")
-# return data
+def read_TPM_expression_table(input_file):
+    data = pd.read_csv(input_file, sep="\t", header="infer")
+    data.rename(columns={"Gene_Name": "Blueberry_Gene"}, inplace=True)
+    return data
 
 
 def read_diff_ex_direction_directory(input_directory):
@@ -83,6 +76,7 @@ def merge_dataframes(
     synteny_homology_data,
     arabidopsis_go_data,
     blueberry_genes_and_module_colors,
+    blueberry_tpm,
     diff_ex_panda_list,
 ):
 
@@ -106,6 +100,9 @@ def merge_dataframes(
     # This has all of the blueberry genes, no duplicates
     # SQL full outer join
     merged = pd.merge(merged, synteny_homology_data, on="Blueberry_Gene", how="outer")
+
+    # NOTE merge in blueberry TPM data
+    merged = pd.merge(merged, blueberry_tpm, on="Blueberry_Gene", how="outer")
 
     # NOTE get the GO data for an Arabidopsis gene only if it is already in the
     # data table, SQL left outer join
@@ -132,6 +129,9 @@ if __name__ == "__main__":
     # TODO give description str
     parser.add_argument("arabidopsis_go_terms", type=str, help="")
 
+    # TODO give description str
+    parser.add_argument("blueberry_tpm", type=str, help="")
+
     parser.add_argument("output_dir", type=str, help="parent path to output results")
 
     args = parser.parse_args()
@@ -139,6 +139,7 @@ if __name__ == "__main__":
     args.synteny_homology_table = os.path.abspath(args.synteny_homology_table)
     args.diff_ex_dir = os.path.abspath(args.diff_ex_dir)
     args.arabidopsis_go_terms = os.path.abspath(args.arabidopsis_go_terms)
+    args.blueberry_tpm = os.path.abspath(args.blueberry_tpm)
     args.output_dir = os.path.abspath(args.output_dir)
 
     log_level = logging.INFO
@@ -146,14 +147,13 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     print()
-    print()
-    print()
 
     synteny_homology_data = read_synteny_homology_table(args.synteny_homology_table)
     arabidopsis_go_data = read_arabidopsis_go_table(args.arabidopsis_go_terms)
     blueberry_genes_and_module_colors = read_gene_modules_table(
         args.genes_and_module_colors
     )
+    blueberry_tpm = read_TPM_expression_table(args.blueberry_tpm)
     diff_ex_panda_list = read_diff_ex_direction_directory(args.diff_ex_dir)
     # NB all primary datafiles now read in
 
@@ -161,6 +161,7 @@ if __name__ == "__main__":
         synteny_homology_data,
         arabidopsis_go_data,
         blueberry_genes_and_module_colors,
+        blueberry_tpm,
         diff_ex_panda_list,
     )
     # TODO get filename to save
