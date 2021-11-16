@@ -31,6 +31,8 @@ def read_diff_ex_direction_directory(input_directory):
         for f in os.listdir(input_directory)
         if (os.path.isfile(os.path.join(input_directory, f))) and ("_Summary" not in f)
     ]
+
+    # MAGIC get filename without extension
     comparison_groupings = [
         os.path.basename(os.path.splitext(f)[0]).rstrip("_Direction")
         for f in only_direction_files
@@ -50,6 +52,7 @@ def read_diff_ex_direction_directory(input_directory):
 
 
 def read_diff_ex_direction_file(input_file, comparison_group):
+    """ """
     data = pd.read_csv(input_file, sep="\t", header="infer")
     data.rename(
         columns={
@@ -69,9 +72,6 @@ def read_arabidopsis_go_table(input_file):
     return data
 
 
-# TODO consider adding TPM/FPKM?
-
-# TODO create function to merge all the datasets
 def merge_dataframes(
     synteny_homology_data,
     arabidopsis_go_data,
@@ -111,26 +111,49 @@ def merge_dataframes(
     return complete
 
 
-# TODO create function to save final output or perform one-liner in main
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
 
-    # TODO give description str
-    parser.add_argument("genes_and_module_colors", type=str, help="")
+    parser.add_argument(
+        "genes_and_module_colors",
+        type=str,
+        help="file representing the blueberry genes and their module IDs",
+    )
 
-    # TODO give description str
-    parser.add_argument("synteny_homology_table", type=str, help="")
+    parser.add_argument(
+        "synteny_homology_table",
+        type=str,
+        help="file representing the blueberry genes and their Arabidopsis orthologs",
+    )
 
     # NOTE 'direction' files will have to be iterated over
-    # TODO give description str
-    parser.add_argument("diff_ex_dir", type=str, help="")
+    parser.add_argument(
+        "diff_ex_dir",
+        type=str,
+        help="""directory containing the differential expressionfiles, files
+        are divided by comparison ID and representup/down differentially
+        regulated""",
+    )
 
-    # TODO give description str
-    parser.add_argument("arabidopsis_go_terms", type=str, help="")
+    parser.add_argument(
+        "arabidopsis_go_terms",
+        type=str,
+        help="file representing an Arabidopsis gene and its GO term list",
+    )
 
-    # TODO give description str
-    parser.add_argument("blueberry_tpm", type=str, help="")
+    parser.add_argument(
+        "blueberry_tpm",
+        type=str,
+        help="""file representing a
+                        blueberry gene and its TPM expression level on a
+                        library by library basis""",
+    )
+
+    parser.add_argument(
+        "output_filename",
+        type=str,
+        help="string representing the name for the output (summary table)",
+    )
 
     parser.add_argument("output_dir", type=str, help="parent path to output results")
 
@@ -140,14 +163,14 @@ if __name__ == "__main__":
     args.diff_ex_dir = os.path.abspath(args.diff_ex_dir)
     args.arabidopsis_go_terms = os.path.abspath(args.arabidopsis_go_terms)
     args.blueberry_tpm = os.path.abspath(args.blueberry_tpm)
+    args.output_filename = os.path.abspath(args.output_filename)
     args.output_dir = os.path.abspath(args.output_dir)
 
     log_level = logging.INFO
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
 
-    print()
-
+    # Read the datasets
     synteny_homology_data = read_synteny_homology_table(args.synteny_homology_table)
     arabidopsis_go_data = read_arabidopsis_go_table(args.arabidopsis_go_terms)
     blueberry_genes_and_module_colors = read_gene_modules_table(
@@ -155,8 +178,8 @@ if __name__ == "__main__":
     )
     blueberry_tpm = read_TPM_expression_table(args.blueberry_tpm)
     diff_ex_panda_list = read_diff_ex_direction_directory(args.diff_ex_dir)
-    # NB all primary datafiles now read in
 
+    # Merge the datasets
     complete = merge_dataframes(
         synteny_homology_data,
         arabidopsis_go_data,
@@ -164,5 +187,15 @@ if __name__ == "__main__":
         blueberry_tpm,
         diff_ex_panda_list,
     )
-    # TODO get filename to save
-    complete.to_csv("test.tsv", sep="\t", header=True, index=False)
+
+    # Fill NA values with a string, because default pandas behavior is to just
+    # have an empty cell
+    complete.fillna("NA", inplace=True)
+
+    # Save the merged dataset
+    complete.to_csv(
+        os.path.join(args.output_dir, args.output_filename),
+        sep="\t",
+        header=True,
+        index=False,
+    )

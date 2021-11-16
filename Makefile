@@ -58,6 +58,7 @@ create_summary_table:
 	       $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv \
 	       $(DEV_DATA)/TPM/Blueberry_TPM_All.tsv \
+	       $(DEV_RESULTS)/Complete_Gene_Summary_Table.tsv \
 	       $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 
 
