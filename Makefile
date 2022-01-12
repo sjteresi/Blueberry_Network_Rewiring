@@ -50,7 +50,7 @@ topGO:
 
 #----------------------------------------#
 # Master summary table
-create_summary_table:
+summary_table:
 	mkdir -p $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 	python $(ROOT_DIR)/scripts/summary_table.py \
 	       $(DEV_DATA)/WGCNA_Data/Final_WGCNA/Genes_and_ModuleColors.tsv \

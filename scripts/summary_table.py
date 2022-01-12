@@ -20,12 +20,23 @@ from scripts.modules.filter_modules import read_gene_modules_table
 
 
 def read_TPM_expression_table(input_file):
+    """
+    Read a TPM expression table from file using Pandas
+    """
     data = pd.read_csv(input_file, sep="\t", header="infer")
     data.rename(columns={"Gene_Name": "Blueberry_Gene"}, inplace=True)
     return data
 
 
 def read_diff_ex_direction_directory(input_directory):
+    """
+    Parse over a directory and get the files that do not have the suffix
+    "_Summary", the files I want are result files from the DEG portion of the
+    project, they specify the up or down regulation of a gene in a context.
+
+    The code then gets the comparison ID from the filename and calls a function
+    to read it as a Pandas dataframe, returning a list of Pandas dataframes
+    """
     only_direction_files = [
         os.path.join(input_directory, f)
         for f in os.listdir(input_directory)
@@ -52,7 +63,18 @@ def read_diff_ex_direction_directory(input_directory):
 
 
 def read_diff_ex_direction_file(input_file, comparison_group):
-    """ """
+    """
+    Read a file of genes that are differentially expressed as a Pandas
+    dataframe.
+
+    Args:
+        input_file (str): Path to file
+        comparison_group (str): Identity of the RNA-seq libraries being
+        compared
+
+    Returns:
+        pandas dataframe
+    """
     data = pd.read_csv(input_file, sep="\t", header="infer")
     data.rename(
         columns={
@@ -65,6 +87,16 @@ def read_diff_ex_direction_file(input_file, comparison_group):
 
 
 def read_arabidopsis_go_table(input_file):
+    """
+    Read a file of Arabidopsis genes and their GO terms. Reformat the GO terms
+    to be more legible.
+
+    Args:
+        input_file (str): Path to file
+
+    Returns:
+        pandas dataframe
+    """
     data = pd.read_csv(
         input_file, sep="\t", header=None, names=["Arabidopsis_Gene", "GO_Terms"]
     )
@@ -79,6 +111,25 @@ def merge_dataframes(
     blueberry_tpm,
     diff_ex_panda_list,
 ):
+    """
+
+    Args:
+        synteny_homology_data (pandas.core.frame.DataFrame): Dataframe of
+            blueberry genes and their Arabidopsis counterparts
+        arabidopsis_go_data (pandas.core.frame.DataFrame): Dataframe of
+            Arabidopsis genes and their associated GO terms
+        blueberry_genes_and_module_colors (pandas.core.frame.DataFrame):
+            Dataframe of blueberry genes and their module IDs (strings)
+        blueberry_tpm (pandas.core.frame.DataFrame): Dataframe of blueberry
+            genes and their gene expression floats
+        diff_ex_panda_list (): Dataframe of blueberry genes and the direction
+            (int) they are differentially expressed in each context
+
+    Returns:
+        complete (pandas.core.frame.DataFrame): Dataframe that contains all of
+        the information of the dataframes above, save for genes in the GO
+        dataset that were not present in the Arabidopsis ortholog set.
+    """
 
     # NOTE merge blueberry gene / module color with blueberry gene / diff ex
     # status
