@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# TODO edit description to remove references to differential expression set and
+# describe that this step is for TOPGO. Describe better that we are only
+# dropping dupliccates on a module-by-module basis
 """
 Execution file
 
@@ -45,14 +48,17 @@ def read_gene_modules_table(filepath):
 
     Returns:
         gene_modules_table (pandas dataframe): columns=[Blueberry_Gene,
-        moduleColor]
+        Module_Color]
     """
     gene_modules_table = pd.read_csv(
         filepath,
         sep="\t",
         header="infer",
     )
-    gene_modules_table.rename(columns={"Gene_Names": "Blueberry_Gene"}, inplace=True)
+    gene_modules_table.rename(
+        columns={"Gene_Names": "Blueberry_Gene", "moduleColor": "Module_Color"},
+        inplace=True,
+    )
 
     return gene_modules_table
 
@@ -81,7 +87,7 @@ def merge_wgcna_genes_with_arabidopsis_ortholog(
 
 
 def save_color_groups(color, dataframe, output_dir):
-    dataframe.drop(columns=["moduleColor", "Blueberry_Gene"], inplace=True)
+    dataframe.drop(columns=["Module_Color", "Blueberry_Gene"], inplace=True)
     dataframe.to_csv(
         os.path.join(output_dir, str(color + "_module_AT_genes.tsv")),
         sep="\t",
@@ -91,7 +97,7 @@ def save_color_groups(color, dataframe, output_dir):
 
 
 def save_missing_color_groups(color, dataframe, output_dir):
-    dataframe.drop(columns=["moduleColor"], inplace=True)
+    dataframe.drop(columns=["Module_Color"], inplace=True)
     dataframe.to_csv(
         os.path.join(output_dir, str(color + "_module_BB_genes.tsv")),
         sep="\t",
@@ -112,7 +118,7 @@ def no_match_arabidopsis(gene_modules, gene_pairs):
 
     Returns:
         missing_genes (pandas dataframe): A pandas frame that is similar in
-        structure to gene_modules, it has a Gene_Name and moduleColor column.
+        structure to gene_modules, it has a Gene_Name and Module_Color column.
         And the entries in this dataframe are the genes that did not have a
         correpsonding pair in gene_pairs. So in effect we return a dataframe of
         blueberry genes in modules that do not have a corresponding AT gene.
@@ -139,7 +145,7 @@ def process(genes_w_module_groups, gene_pairs, output_dir):
     )
 
     # MAGIC column name
-    grouped_modules = blueberry_genes_w_no_match.groupby(["moduleColor"])
+    grouped_modules = blueberry_genes_w_no_match.groupby(["Module_Color"])
     for color, frame in grouped_modules:
         output_location = os.path.join(output_dir, "missing_blueberry_modules")
         if not os.path.exists(output_location):
@@ -151,7 +157,7 @@ def process(genes_w_module_groups, gene_pairs, output_dir):
         gene_modules_table, synteny_homology_table
     )
     # MAGIC column name
-    grouped_modules = modules_w_AT.groupby(["moduleColor"])
+    grouped_modules = modules_w_AT.groupby(["Module_Color"])
 
     for color, frame in grouped_modules:
         # NOTE
