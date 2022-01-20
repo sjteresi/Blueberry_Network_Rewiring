@@ -18,7 +18,7 @@ echo $HOSTNAME
 echo "My Task ID:" $SLURM_ARRAY_TASK_ID
 
 # source activate wgcna
-cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/scripts/WGCNA/
+cd /mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/src/WGCNA/
 
 Rscript Blueberry_WGCNA.R
 

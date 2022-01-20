@@ -29,7 +29,7 @@ The code is dividied into 3 main directories. `At_BB`, `fpkm`, and `WGCNA`. Desc
 - `WGCNA`: `TODO` add more here. Use a TPM matrix in conjunction with the `WGCNA` package in R to generate a gene network.
 
 ## Requirements:
-Please install **Pip** so that you may easily install Python packages. Then use Pip to go over our `scripts/common.txt` and install the needed Python packages: `pip install -r requirements.txt`. It is wise to create a virtual environment in case you have any conflicting package installations. Please refer to the [documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) for notes on that.
+Please install **Pip** so that you may easily install Python packages. Then use Pip to go over our `src/common.txt` and install the needed Python packages: `pip install -r requirements.txt`. It is wise to create a virtual environment in case you have any conflicting package installations. Please refer to the [documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) for notes on that.
 
 ## At_BB:
 This block of work has both non-code tasks and code tasks. First, I ran the blueberry genome through CoGe to perform a syntelog search. Second, I supplement the results with a BLAST search.
@@ -40,7 +40,7 @@ This section describes the methods to run [SynMap](https://genomevolution.org/Co
 ### Running BLAST:
 We are doing this step to identify homologs that may have been missed using a synteny-based approach. Genes that could have been missed by the synteny search include single-gene transpositions (and others). We are going to use a BLAST database of protein predictions.
 
-Please refer to the script at `scripts/At_BB/blastall.sb` for more information. First we generate a BLAST database and prepare it for protein indices. Then we can run the BLAST algorithm on the two sequence files, this may take awhile. For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
+Please refer to the script at `src/At_BB/blastall.sb` for more information. First we generate a BLAST database and prepare it for protein indices. Then we can run the BLAST algorithm on the two sequence files, this may take awhile. For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
 
 ### Filtering and Combining our Data:
 We have two data files, one from Synmap (synteny) and one from BLAST (homology). Now we must filter both outputs and merge the files. I orchestrate all of the running of the code from `generate_pairs.py` but compartmentalize each function/class object as necessary into their own files. Please refer to `generate_pairs.py` for the general control flow of the project from this point on out.
@@ -65,7 +65,7 @@ We want to examine our merged data file, and take the subset of Arabidopsis-Blue
 ## WGCNA:
 [WGNCA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/index.html) is an R package for creating **Weighted Gene Co-Expression Networks**. We are using it to identify clusters (modules) of highly correlated genes; we will use that as a lens to interpret the functions and relations of genes involved in galling response.
 
-In regards to the code, I follow the tutorials found at this [link](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/), where I follow **part I**. The code found in `scripts/WGCNA` is an adapted version of the tutorials, notably there are no clinical traits that I am relating modules to.
+In regards to the code, I follow the tutorials found at this [link](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/), where I follow **part I**. The code found in `src/WGCNA` is an adapted version of the tutorials, notably there are no clinical traits that I am relating modules to.
 
 ### WGCNA Code Version Control:
 * R == 4.0.2
