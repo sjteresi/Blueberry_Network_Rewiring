@@ -16,7 +16,7 @@ from count_matrix import import_count_matrix
 from tpm import calc_tpm
 
 
-def process(gene_annotation, count_matrix, output_dir, file_name):
+def process(gene_annotation, count_matrix, output_dir):
     """Run the script, go from annotation and count file to TPM table.
 
     Args:
@@ -27,10 +27,6 @@ def process(gene_annotation, count_matrix, output_dir, file_name):
             (N_Genes, N_Samples).
 
         output_dir (str): string of path for output directory to store data
-
-        file_name (str): a string to be used as a prefix for the file_name,
-        ought to represent whether the file is single or all haplotype in
-        origin.
 
     Returns:
         None. Saves a table of TPM values to the output_dir
@@ -56,21 +52,18 @@ def process(gene_annotation, count_matrix, output_dir, file_name):
 
     # To disk
     tpm_vals.to_csv(
-        os.path.join(output_dir, f"Blueberry_TPM_{file_name}.tsv"), sep="\t"
+        os.path.join(output_dir, "Blueberry_TPM_All_Haplotype.tsv"), sep="\t"
     )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="calculate gene lengths")
+    parser = argparse.ArgumentParser(description="calculate TPM")
     path_main = os.path.abspath(__file__)
     parser.add_argument("genes_input_file", type=str, help="parent path of gene file")
     parser.add_argument("count_matrix", type=str, help="parent path of counts file")
-    parser.add_argument("selection", type=str, help="all or single haplotype")
     parser.add_argument(
-        "--output_dir",
-        "-o",
+        "output_dir",
         type=str,
-        default=os.path.join(path_main, "../../../../", "Blueberry_Data/TPM"),
         help="parent directory to output results",
     )
 
@@ -79,4 +72,4 @@ if __name__ == "__main__":
     args.count_matrix = os.path.abspath(args.count_matrix)
     args.output_dir = os.path.abspath(args.output_dir)
 
-    process(args.genes_input_file, args.count_matrix, args.output_dir, args.selection)
+    process(args.genes_input_file, args.count_matrix, args.output_dir)

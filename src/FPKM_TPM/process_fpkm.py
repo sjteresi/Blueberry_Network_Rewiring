@@ -16,8 +16,7 @@ from count_matrix import import_count_matrix
 from fpkm import calc_fpkm
 
 
-# TODO Alder modify function call
-def process(gene_annotation, count_matrix, output_dir, file_name):
+def process(gene_annotation, count_matrix, output_dir):
     """Run the script, go from annotation and count file to FPKM table.
 
     Args:
@@ -30,8 +29,7 @@ def process(gene_annotation, count_matrix, output_dir, file_name):
         output_dir (str): string of path for output directory to store data
 
     Returns:
-        None. Saves a table of FPKM values to the output_dir as
-        'Blueberry_FPKM.tsv'.
+        None. Saves a table of FPKM values to the output_dir
     """
     # import genes and their gene lengths
     ids_and_exon_lengths = import_genes(gene_annotation)
@@ -52,30 +50,25 @@ def process(gene_annotation, count_matrix, output_dir, file_name):
     fpkm_vals = pd.DataFrame(fpkm_vals, columns=merged_data.columns)
     fpkm_vals.set_index(merged_data.index, inplace=True)
 
-    # TODO Alder modify this call, use str(x + y) notation on the
-    # 'Blueberry_FPKM' part
-    fpkm_vals.to_csv(os.path.join(output_dir, f"Blueberry_FPKM_{file_name}.tsv"), sep="\t")
+    fpkm_vals.to_csv(
+        os.path.join(output_dir, "Blueberry_FPKM_All_Haplotype.tsv"), sep="\t"
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="calculate gene lengths")
+    parser = argparse.ArgumentParser(description="calculate FPKM")
     path_main = os.path.abspath(__file__)
     parser.add_argument("genes_input_file", type=str, help="parent path of gene file")
     parser.add_argument("count_matrix", type=str, help="parent path of counts file")
-    parser.add_argument("selection", type=str, help= "all or single haplotype")
     parser.add_argument(
-        "--output_dir",
-        "-o",
+        "output_dir",
         type=str,
-        default=os.path.join(path_main, "../../../../", "Blueberry_Data/FPKM"),
         help="parent directory to output results",
     )
-    # TODO Alder add a arg parser for type of data. Call it 'selection'
 
     args = parser.parse_args()
     args.genes_input_file = os.path.abspath(args.genes_input_file)
     args.count_matrix = os.path.abspath(args.count_matrix)
     args.output_dir = os.path.abspath(args.output_dir)
 
-    # TODO Alder modify function call
-    process(args.genes_input_file, args.count_matrix, args.output_dir, args.selection)
+    process(args.genes_input_file, args.count_matrix, args.output_dir)

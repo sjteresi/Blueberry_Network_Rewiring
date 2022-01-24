@@ -7,15 +7,20 @@ DEV_DATA := $(ROOT_DIR)/data
 DEV_RESULTS := $(ROOT_DIR)/results
 DEV_DIFFEXDIR := $(DEV_DATA)/Diff_Ex/EdgeR_Output
 
+DEV_GENE_ANNOTATION := $(DEV_DATA)/V_corymbosum_v1.0_geneModels.gff
+
 # Orthology analysis related paths
 DEV_SYNTELOGS := $(DEV_DATA)/synmap_out_8_12_2020.txt
 DEV_HOMOLOGS := $(DEV_DATA)/At-Blueberry.blast
 DEV_ORTHOLOGY_OUT_DIR := $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology
 
+# FPKM/TPM related paths
+DEV_EXPRESSION_OUT_DIR := $(DEV_RESULTS)/FPKM_TPM
+DEV_COLLATED_COUNT_FILE := $(DEV_DATA)/AllCounts_Blueberry.tsv
+
 # WGCNA analysis related paths
 DEV_WGCNA_OUT_DIR := $(DEV_RESULTS)/WGCNA
 
-DEV_GENOME := $(DEV_DATA)/Genome/V_corymbosum_v1.0_geneModels.gff
 DEV_ORTHOLOGY := $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv
 
 # DEV_RESULTS := $(DEV_DATA)/results
@@ -26,6 +31,13 @@ gen_ortholog_table:
 	mkdir -p $(DEV_ORTHOLOGY_OUT_DIR)
 	$(ROOT_DIR)/src/Arabidopsis_Blueberry_Orthology/filter_orthologs.py $(DEV_SYNTELOGS) $(DEV_HOMOLOGS) $(DEV_ORTHOLOGY_OUT_DIR)
 
+gen_FPKM_table:
+	mkdir -p $(DEV_EXPRESSION_OUT_DIR)
+	python $(ROOT_DIR)/src/FPKM_TPM/process_fpkm.py $(DEV_GENE_ANNOTATION) $(DEV_COLLATED_COUNT_FILE) $(DEV_EXPRESSION_OUT_DIR)
+
+gen_TPM_table:
+	mkdir -p $(DEV_EXPRESSION_OUT_DIR)
+	python $(ROOT_DIR)/src/FPKM_TPM/process_tpm.py $(DEV_GENE_ANNOTATION) $(DEV_COLLATED_COUNT_FILE) $(DEV_EXPRESSION_OUT_DIR)
 
 # NOTE WGCNA must be run on cluster. Just putting the command here in the Makefile for reference of order of code.
 # A feature of it being run on the cluster is that some of the code-paths are hard-coded in the script
