@@ -50,10 +50,6 @@ module_conversion:
 	mkdir -p $(DEV_RESULTS)/Modules
 	python $(ROOT_DIR)/src/modules/filter_modules.py $(DEV_DATA)/WGCNA_Data/Final_WGCNA/Genes_and_ModuleColors.tsv $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv $(DEV_RESULTS)/Modules
 
-create_diff_ex_tables:
-	mkdir -p $(DEV_RESULTS)/Differential_Expression_Tables/
-	python $(ROOT_DIR)/src/diff_ex_tables/diff_ex_tables.py $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ $(DEV_RESULTS)/Differential_Expression_Tables
-
 
 # Work on GO:
 # Distill the raw gene universe /  GO file down into a format for TopGO
