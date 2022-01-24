@@ -336,7 +336,7 @@ process = function(load_data_function, test_type, softpower) {
   BlueberryData = load_data_function  # global variable for inspection
 
   # Set output directory, MAGIC HPCC path
-  setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/WGCNA_Data")
+  setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/results/WGCNA")
   transposed_BlueberryData = as.data.frame(t(subset(BlueberryData, select = -c(Gene_Name))))
   names(transposed_BlueberryData) = BlueberryData$Gene_Name
   rownames(transposed_BlueberryData) = names(subset(BlueberryData, select = -c(Gene_Name)))
