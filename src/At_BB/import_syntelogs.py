@@ -86,8 +86,12 @@ def import_syntelogs(syntelog_input_file):
     # gene pair from
     gene_data["Point_of_Origin"] = "Synteny"
 
-    # Need to take first occurrence of the gene, the one with the smallest
+    # Sort by Name and E-Values
+    gene_data.sort_values(
+        by=["Blueberry", "E_Value"], ascending=(True, True), inplace=True
+    )
+    # Need to take first occurrence of a duplicated gene, the one with the smallest
     # E-Value
-    gene_data = gene_data.loc[gene_data.groupby("Blueberry")["E_Value"].idxmin()]
+    gene_data = gene_data.drop_duplicates(subset=["Blueberry"], keep="first")
 
     return gene_data
