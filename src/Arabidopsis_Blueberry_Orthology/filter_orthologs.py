@@ -1,33 +1,28 @@
 #!/usr/bin/env python3
 
 """
-Master code file. Control filtration of syntelog data and homolog data. Manage
-merging of the two dataframes and orchestrate all file commands.
+Master code file.
+Filter homolog (BLAST) data
+Filter syntelog (SynMap) data
+Merge both files together
 """
 
 __author__ = "Scott Teresi"
 
 import argparse
 import os
-
 import logging
 import coloredlogs
-
 
 from import_syntelogs import import_syntelogs
 from import_homologs import import_homologs
 from merge_homo_synt import merge_homo_synt
-from import_diff_exp import ExpData
-from union_data import Union_Data
 
 
 def process(
     syntelog_input_file,
     homolog_input_file,
     data_output_path,
-    diff_exp_dir,
-    stat_type,
-    haplotype,
 ):
     # Import the synteny data from raw file
     logger.info("Importing syntelogs: %s" % syntelog_input_file)
@@ -63,35 +58,11 @@ def process(
     logger.info("Writing merged data to disk: %s" % file_to_save)
     merged_all.to_csv(file_to_save, sep="\t", header=True, index=False)
 
-    # Get differential expression data
-    logger.info("Loading the differential expression data...")
-    instance_Exp_Data = ExpData(diff_exp_dir)
-
-    # NOTE union portion of code now
-    # Get union of blueberry genes between diff exp and synteny/homology,
-    # and thus the corresponding Arabidopsis gene
-    # I.E determine which blueberry genes of the differential expression data
-    # have an Arabidopsis ortholog and create a new set of differential
-    # expression data files, now with the arabidopsis ortholog.
-
-    logger.info("Find the union between the diff exp data and the merged data")
-    union_data_output_dir = os.path.join(
-        data_output_path, "Union", haplotype, stat_type
-    )
-    if not os.path.exists(union_data_output_dir):
-        os.makedirs(union_data_output_dir)
-    union_obj = Union_Data(merged_all, instance_Exp_Data)
-
-    # Save results to disk
-    # logger.info("Saving union results to disk: %s" % union_data_output_dir)
-    union_obj.save_union(union_data_output_dir)
-    union_obj.save_summary_union(union_data_output_dir)
-
 
 if __name__ == "__main__":
-    """Command line interface to link syntelogs together."""
+    """Command line interface to link orthologs together."""
 
-    parser = argparse.ArgumentParser(description="Filter syntelogs")
+    parser = argparse.ArgumentParser(description="Filter orthologs")
     path_main = os.path.abspath(__file__)
     parser.add_argument(
         "syntelog_input_file", type=str, help="parent path of syntelog file"
@@ -101,22 +72,9 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "diff_ex_dir",
-        type=str,
-        help="parent path of input directory",
-    )
-
-    parser.add_argument(
-        "stat_type",
-        type=str,
-        help="what type of error correction did you use",
-    )
-    parser.add_argument("haplotype", type=str, help="single or all dataset")
-    parser.add_argument(
-        "--output_directory",
+        "output_directory",
         type=str,
         help="parent path of output directory",
-        default=os.path.join(path_main, "../../../../Blueberry_Data/AtBB/data_output"),
     )
 
     parser.add_argument(
@@ -126,7 +84,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.syntelog_input_file = os.path.abspath(args.syntelog_input_file)
     args.homolog_input_file = os.path.abspath(args.homolog_input_file)
-    args.diff_ex_dir = os.path.abspath(args.diff_ex_dir)
     args.output_directory = os.path.abspath(args.output_directory)
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logger = logging.getLogger(__name__)
@@ -138,7 +95,4 @@ if __name__ == "__main__":
         args.syntelog_input_file,
         args.homolog_input_file,
         args.output_directory,
-        args.diff_ex_dir,
-        args.stat_type,
-        args.haplotype,
     )
