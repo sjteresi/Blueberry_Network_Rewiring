@@ -55,9 +55,12 @@ def import_homologs(homolog_input_file):
     # Trim E-values less than 0.05
     gene_data = gene_data.loc[gene_data["E_Value"] < 0.05]
 
-    # Need to take first occurrence of the gene, the one with the smallest
+    # Sort by Name and E-Values
+    gene_data.sort_values(by=["Query", "E_Value"], ascending=(True, True), inplace=True)
+
+    # Need to take first occurrence of a duplicated gene, the one with the smallest
     # E-Value
-    gene_data = gene_data.loc[gene_data.groupby("Query")["E_Value"].idxmin()]
+    gene_data = gene_data.drop_duplicates(subset=["Query"], keep="first")
 
     # Rename columns
     gene_data.rename(

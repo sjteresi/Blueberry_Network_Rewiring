@@ -47,6 +47,13 @@ def process(
     logger.info("Writing homolog data to disk: %s" % file_to_save)
     homologs.to_csv(file_to_save, sep="\t", header=True, index=False)
 
+    # NOTE
+    # For both the synteny set and the homology set, if there was a situation
+    # where a blueberry gene pointed to multiple non-unique Arabidopsis genes I
+    # only took the Blueberry-Arabidopsis pair in which the E-value was
+    # greatest. This makes it so that both dataframes are composed of
+    # non-unique blueberry genes, Arabidopsis genes may repeat however.
+
     # Merge the synteny and homology data
     logger.info("Merging the data...")
     merged_all = merge_homo_synt(syntelogs, homologs)
