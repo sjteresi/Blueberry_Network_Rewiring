@@ -1,3 +1,11 @@
+# By Scott
+# NOTE I am not as proficient in R as I am in Python, however I tried my best to provide
+# ample notes in this script.
+# Obviously not all genes can be mapped onto the GO, we never did anything with the genes that were lost,
+# FUTURE maybe investigate more...
+# NOTE we did not take GO hierarchy into account because since this dataset is already downstream
+# of a lot of filtering, we did not want to penalize the model further. 
+
 # NOTE each installation command must be done separately
 #install.packages("BiocManager")
 #BiocManager::install(lib='/home/scott/R/x86_64-pc-linux-gnu-library/4.1')
@@ -15,9 +23,7 @@ suppressPackageStartupMessages(library(tools))
 # Check to see you have the args
 args= commandArgs(trailingOnly=TRUE)
 
-
 # NOTE get input files from input arguments
-
 # MAGIC represents folder of modules in Arabidopsis gene format
 files_w_tsv = Sys.glob(file.path(args[1], "*.tsv"))
 
@@ -40,6 +46,7 @@ function_run_topgo = function(master_genes, geneID2GO, my_interesting_genes, mod
 		     allGenes = geneList,
 		     annot = annFUN.gene2GO,
 		     gene2GO = geneID2GO)
+
 	# NOTE get the number of genes in this interesting list
 	# NOTE how many genes am I losing when I perform this step?
 	# Do some genes not have the 'MF' ontology or something?
@@ -70,10 +77,6 @@ function_run_topgo = function(master_genes, geneID2GO, my_interesting_genes, mod
        		# to my modules, and the GO hieracrhy is useful information, I don't want
        		# to penalize the stats further, so I am going with classic and won't do
        		# an FDR.
-
-
-
-
 
 	# list the top significant GO terms
     	allRes = GenTable(GOdata, classicFisher=resultFisher_classic, 

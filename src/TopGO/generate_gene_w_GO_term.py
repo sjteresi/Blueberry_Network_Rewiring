@@ -77,11 +77,13 @@ def read_master_GO_table(go_master_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("go_master_file", type=str, help="downloaded from TAIR")
-    parser.add_argument("output_dir", type=str, help="parent path to output results")
+    parser.add_argument(
+        "go_output_path", type=str, help="output path of filtered GO file"
+    )
     args = parser.parse_args()
 
     args.go_master_file = os.path.abspath(args.go_master_file)
-    args.output_dir = os.path.abspath(args.output_dir)
+    args.go_output_path = os.path.abspath(args.go_output_path)
 
     log_level = logging.INFO
     logger = logging.getLogger(__name__)
@@ -89,8 +91,4 @@ if __name__ == "__main__":
 
     data = read_master_GO_table(args.go_master_file)
 
-    # MAGIC filename
-    file_output_name = os.path.abspath(
-        os.path.join(args.output_dir, "ArabidopsisGene_w_GO.tsv")
-    )
-    data.to_csv(file_output_name, sep="\t", index=False, header=False)
+    data.to_csv(args.go_output_path, sep="\t", index=False, header=False)

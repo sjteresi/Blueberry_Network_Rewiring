@@ -27,8 +27,9 @@ DEV_WGCNA_OUT_DIR := $(DEV_RESULTS)/WGCNA
 # Output for later
 DEV_WGCNA_GENES_AND_MODULES := $(DEV_WGCNA_OUT_DIR)/Genes_and_ModuleColors.tsv
 
-# Misc related paths
-DEV_MODULE_CONVERSION := $(DEV_RESULTS)/Modules
+# TopGO related paths
+DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_DATA)/ATH_GO_GOSLIM.txt
+DEV_FILTERED_GO_OUTPUT := $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv
 
 
 .PHONY: dev help
@@ -45,18 +46,19 @@ gen_TPM_table:
 	mkdir -p $(DEV_EXPRESSION_OUT_DIR)
 	python $(ROOT_DIR)/src/FPKM_TPM/process_tpm.py $(DEV_GENE_ANNOTATION) $(DEV_COLLATED_COUNT_FILE) $(DEV_EXPRESSION_OUT_DIR)
 
-# NOTE WGCNA must be run on cluster. Just putting the command here in the Makefile for reference of order of code.
-# A feature of it being run on the cluster is that some of the code-paths are hard-coded in the script
+# NOTE WGCNA must be run on cluster. Just putting the command here in the Makefile for reference of order of code run.
+# A feature of it being run on the cluster and in R is that some of the code-paths are hard-coded in the script
 run_WGCNA:
 	mkdir -p $(DEV_RESULTS)/WGCNA
 	sbatch $(ROOT_DIR)/src/WGCNA/run_WGCNA.sb
 
 # Work on GO:
-# Distill the raw gene universe /  GO file down into a format for TopGO
+# Distill the raw gene universe GO file down into a format for TopGO
 GO:
 	mkdir -p $(DEV_RESULTS)/GO
-	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DATA)/GO/ATH_GO_GOSLIM.txt $(DEV_RESULTS)/GO
+	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DOWNLOADED_GO_UNIVERSE) $(DEV_FILTERED_GO_OUTPUT)
 
+# Run TopGO to get over/under representation of terms
 topGO:
 	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_DATA)/WGCNA_Data/modulecolors_AT $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv $(DEV_RESULTS)/GO
 
@@ -86,5 +88,3 @@ generate_exp_table_melanie:
 	python3 $(ROOT_DIR)/src/exp_table_melanie.py $(DEV_DATA)/FPKM/Blueberry_FPKM_All.tsv $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv $(DEV_RESULTS)/melanie_exp_syn_table
 
 
-help:               ## Show this help.
-	fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
