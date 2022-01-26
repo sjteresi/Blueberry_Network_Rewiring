@@ -13,17 +13,23 @@ DEV_GENE_ANNOTATION := $(DEV_DATA)/V_corymbosum_v1.0_geneModels.gff
 DEV_SYNTELOGS := $(DEV_DATA)/synmap_out_8_12_2020.txt
 DEV_HOMOLOGS := $(DEV_DATA)/At-Blueberry.blast
 DEV_ORTHOLOGY_OUT_DIR := $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology
+# Output for later
+DEV_SYNTENY_HOMOLOGY_TABLE := $(DEV_ORTHOLOGY_OUT_DIR)/Synteny_Homology_Table.tsv 
+
 
 # FPKM/TPM related paths
 DEV_EXPRESSION_OUT_DIR := $(DEV_RESULTS)/FPKM_TPM
 DEV_COLLATED_COUNT_FILE := $(DEV_DATA)/AllCounts_Blueberry.tsv
 
+
 # WGCNA analysis related paths
 DEV_WGCNA_OUT_DIR := $(DEV_RESULTS)/WGCNA
+# Output for later
+DEV_WGCNA_GENES_AND_MODULES := $(DEV_WGCNA_OUT_DIR)/Genes_and_ModuleColors.tsv
 
-DEV_ORTHOLOGY := $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv
+# Misc related paths
+DEV_MODULE_CONVERSION := $(DEV_RESULTS)/Modules
 
-# DEV_RESULTS := $(DEV_DATA)/results
 
 .PHONY: dev help
 
@@ -46,13 +52,12 @@ run_WGCNA:
 	sbatch $(ROOT_DIR)/src/WGCNA/run_WGCNA.sb
 
 # Convert modules (blueberry genes) to Arabidopsis genes
+# NOTE not exactly needed, because this is partially accomplished in the summary table.
+# However, some of the functions are used in the summary table script. 
 module_conversion:
 	mkdir -p $(DEV_RESULTS)/Modules
-	python $(ROOT_DIR)/src/modules/filter_modules.py $(DEV_DATA)/WGCNA_Data/Final_WGCNA/Genes_and_ModuleColors.tsv $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv $(DEV_RESULTS)/Modules
+	python $(ROOT_DIR)/src/modules/filter_modules.py $(DEV_WGCNA_GENES_AND_MODULES) $(DEV_SYNTENY_HOMOLOGY_TABLE) $(DEV_MODULE_CONVERSION)
 
-create_diff_ex_tables:
-	mkdir -p $(DEV_RESULTS)/Differential_Expression_Tables/
-	python $(ROOT_DIR)/src/diff_ex_tables/diff_ex_tables.py $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ $(DEV_RESULTS)/Differential_Expression_Tables
 
 
 # Work on GO:
