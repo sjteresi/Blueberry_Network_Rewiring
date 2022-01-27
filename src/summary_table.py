@@ -15,49 +15,8 @@ import re
 import os
 from functools import reduce
 
-
-def read_gene_modules_table(filepath):
-    """
-    Read the table of blueberry genes and module identities that was
-    previously created
-
-    Args:
-        filepath (str): Path to the table
-
-    Returns:
-        gene_modules_table (pandas dataframe): columns=[Blueberry_Gene,
-        Module_Color]
-    """
-    gene_modules_table = pd.read_csv(
-        filepath,
-        sep="\t",
-        header="infer",
-    )
-    gene_modules_table.rename(
-        columns={"Gene_Names": "Blueberry_Gene", "moduleColor": "Module_Color"},
-        inplace=True,
-    )
-
-    return gene_modules_table
-
-
-def read_synteny_homology_table(filepath):
-    """
-    Read the synteny/homology table of blueberry and arabidopsis genes that was
-    previously created
-    Args:
-        filepath (str): Path to the table
-
-    Returns:
-        synteny_homology_table (pandas dataframe): columns = [
-        Arabidopsis_Gene, Blueberry_Gene, E_Value, Point_of_Origin]
-    """
-    synteny_homology_table = pd.read_csv(
-        filepath,
-        sep="\t",
-        header="infer",
-    )
-    return synteny_homology_table
+from src.modules.filter_modules import read_synteny_homology_table
+from src.modules.filter_modules import read_gene_modules_table
 
 
 def read_TPM_expression_table(input_file):
