@@ -33,6 +33,7 @@ master_genes = names(geneID2GO)  # NB global
 
 # output directory
 output_dir = args[3]
+doc_dir = args[4]
 ############################################
 
 
@@ -128,3 +129,10 @@ for(input_module in files_w_tsv){
 	function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'BP', output_dir)
 	function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'CC', output_dir)
 }
+
+# NB this outputs the session information for easy package management.
+# Perhaps better than outputting a conda env
+# MAGIC get nice doc dir
+sink(file=paste(doc_dir, "TopGO_sessionInfo.txt", sep='/'))
+sessionInfo()
+sink()

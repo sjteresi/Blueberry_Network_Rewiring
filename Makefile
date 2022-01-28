@@ -5,6 +5,7 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DEV_DATA := $(ROOT_DIR)/data
 DEV_RESULTS := $(ROOT_DIR)/results
+DEV_DOCUMENTATION := $(ROOT_DIR)/doc
 DEV_DIFFEXDIR := $(DEV_DATA)/Diff_Ex/EdgeR_Output
 
 DEV_GENE_ANNOTATION := $(DEV_DATA)/V_corymbosum_v1.0_geneModels.gff
@@ -26,6 +27,9 @@ DEV_COLLATED_COUNT_FILE := $(DEV_DATA)/AllCounts_Blueberry.tsv
 DEV_WGCNA_OUT_DIR := $(DEV_RESULTS)/WGCNA
 # Output for later
 DEV_WGCNA_GENES_AND_MODULES := $(DEV_WGCNA_OUT_DIR)/Genes_and_ModuleColors.tsv
+
+# Module filtering related paths
+DEV_MODULES_IN_AT := $(DEV_RESULTS)/Modules/modulecolors_AT
 
 # TopGO related paths
 DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_DATA)/ATH_GO_GOSLIM.txt
@@ -52,15 +56,25 @@ run_WGCNA:
 	mkdir -p $(DEV_RESULTS)/WGCNA
 	sbatch $(ROOT_DIR)/src/WGCNA/run_WGCNA.sb
 
+# Convert modules (blueberry genes) to Arabidopsis genes
+# NOTE this step is necessary for TopGO even though the summary table produces a more legible table
+blueberry_module_conversion_to_arabidopsis:
+	mkdir -p $(DEV_RESULTS)/Modules
+	# Note sub dirs are made in the Python script
+	python $(ROOT_DIR)/src/modules/filter_modules.py $(DEV_WGCNA_GENES_AND_MODULES) $(DEV_SYNTENY_HOMOLOGY_TABLE) $(DEV_RESULTS)/Modules
+
 # Work on GO:
 # Distill the raw gene universe GO file down into a format for TopGO
-GO:
+filter_GO:
 	mkdir -p $(DEV_RESULTS)/GO
 	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DOWNLOADED_GO_UNIVERSE) $(DEV_FILTERED_GO_OUTPUT)
 
 # Run TopGO to get over/under representation of terms
+# NOTE need to go back and get filter modules code because those individually processed modules are used in TopGO
+# AND the data folder for top go should actually be a results folder
 topGO:
-	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_DATA)/WGCNA_Data/modulecolors_AT $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv $(DEV_RESULTS)/GO
+	mkdir -p $(DEV_RESULTS)/GO/topGO
+	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/topGO $(DEV_DOCUMENTATION)
 
 #----------------------------------------#
 # Master summary table
