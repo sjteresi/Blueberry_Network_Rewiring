@@ -22,14 +22,55 @@ Breed new blueberry cultivars that are resistant to the blueberry stem gall wasp
 | Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
 
 # Code:
-The code is dividied into 3 main directories. `At_BB`, `fpkm`, and `WGCNA`. Descriptions follow:
+The code is broken up into several different scripts. The files are as follows:
 
-- `At_BB`: Use the output from a BLAST database search of blueberry proteins to Arabidopsis along with the output from **SynMap** on [CoGe](https://genomevolution.org/CoGe/SynMap.pl) to identify homologs and syntelogs. Join these two datasets together and then facilitate subsetting from a list of differentially expressed genes previously calculated with EdgeR at [Blueberry Expression Analysis](https://github.com/EdgerLab/Blueberry_RNA_Seq_Expression_Analysis). Output: Lists of *Arabidopsis* genes (that match with differentially expressed genes) for each RNA-seq library.
-- `fpkm`: Use the count matrix previously calculated at [Blueberry Expression Analysis](https://github.com/EdgerLab/Blueberry_RNA_Seq_Expression_Analysis) with the gene annotation to calculate FPKM.
-- `WGCNA`: `TODO` add more here. Use a TPM matrix in conjunction with the `WGCNA` package in R to generate a gene network.
+**/src:**  
+-  **/Arabidopsis_Blueberry_Orthology**  
+	- `filter_orthologs.py`: Creates an ortholog table. `TODO`: Confirm and check this in more detail.
+		- Inputs: Syntelogs, Orthologs, Output directory.
+		- Outputs: An ortholog table. `TODO`: Confrim this. The output does not exist on my computer, not where the make file is supposed to send it.
+	- `import_homologs.py`: Imports the homolog data and provides a calss for its access. Helper file of `filter_orthologs.py`.
+	- `import_syntelogs.py`: Imports syntelogs from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
+	- `merge_homo_synt`: Merges the homologs and syntelogs. Helper file of `filter_orthologs.py`
+	- `blastall.sb`: Batch file that runs the BLAST search on the computing cluster. `TODO`: Not sure about this one.
+-  **/FPKM_TPM**  
+	- `process_fpkm.py`: Saves a FPKM table
+		- Inputs: Genes input file, count matrix, Output directory 
+		- Outputs: Saves a table of FPKM values to the output directory.
+	- `gene_lengths.py`: Reads a gene file and sums the length of the gene. Helper file of `process_fpkm.py` and `process_tpm.py`.
+	- `count_matrix.py`: Reads in and cleans the count data. Helper file of `process_fpkm.py` and `process_tpm.py`.
+	- `fpkm.py`: Calculates the FPKM (fragments per kilabase trascript per million reads)
+	- `process_tpm.py`: Generates and saves a TPM table from gene annotation and count matrix.
+		- Inputs: Gene input files, count matrix, Output directory (same arguments as `process_fpkm.py`)
+		- Outputs: Saves a TPM table.
+	- `tpm.py`: Calculates the TPM matrix. Helper file of `process_tpm.py`
+-  **/WGCNA**  
+	- `run_wgcna.sb`: Used to run `Blueberry_WGCNA.R` on the computing cluster.
+	- `Blueberry_WGCNA.R`: `TODO`
+-  **/modules**  
+	- `filter_modules.py`: Find union of differential expression / orthology set with the WGCNA output of 10 genes assigned to modules.
+		- Inputs: WGCNA output file, Syntenny/homology output file, output folder
+		- Outputs: `TODO`
+-  **/TopGO**  
+	- `topGo_blueberry.R`: Runs TopGo
+		- Inputs: Folder of modules in Arabadposis gene fromat, `TODO`: Tsv containing?, Output directory, Documentation directory
+		- Outputs: `TODO`: ???
+	- `generate_gene_w_GO_term.py`: Filters a GO term database of Arabidopsis genes.
+		- Inputs: Go master file - downloaded from TAIR, Output directory
+		- Outputs: Creates a csv derived from the GO term database. 
+-  **/gene_stats**  
+	- `operations.py`: Calculates the percentages of each gene belonging to each identification type. Note: this is not used anywhere, and whenever a gene is found by both, Syntenny was chosen.
+-  **/requirements**  
+	- `common.txt`: A list of the common requirements. See next section.
+- `summary_table.py`: Unifies the following dataframes - differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO terms, and Blueberry gene network module identity.
+	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
+	- Outputs: Creates a csv in the output directory of the unified dataframe.
+- `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
+	- Inputs: Parent path of fpkm table, parent path of syntelog table, output directory
+	- Outputs: Saves FPKM table as a csv.
 
 ## Requirements:
-Please install **Pip** so that you may easily install Python packages. Then use Pip to go over our `src/common.txt` and install the needed Python packages: `pip install -r requirements.txt`. It is wise to create a virtual environment in case you have any conflicting package installations. Please refer to the [documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) for notes on that.
+Please install **Pip** so that you may easily install Python packages. Then use Pip to go over our `src/requirements/common.txt` and install the needed Python packages: `pip install -r common.txt`. It is wise to create a virtual environment in case you have any conflicting package installations. Please refer to the [documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) for notes on that.
 
 ## At_BB:
 This block of work has both non-code tasks and code tasks. First, I ran the blueberry genome through CoGe to perform a syntelog search. Second, I supplement the results with a BLAST search.
