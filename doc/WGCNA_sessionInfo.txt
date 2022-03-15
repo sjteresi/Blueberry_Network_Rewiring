@@ -1,0 +1,57 @@
+R version 4.0.0 (2020-04-24)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS:   /opt/software/R/4.0.0-intel-2019b/lib64/R/lib/libR.so
+LAPACK: /opt/software/R/4.0.0-intel-2019b/lib64/R/modules/lapack.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] docstring_1.0.0       forcats_0.5.0         stringr_1.4.0        
+ [4] dplyr_0.8.5           purrr_0.3.4           readr_1.3.1          
+ [7] tidyr_1.0.2           tibble_3.0.1          ggplot2_3.3.0        
+[10] tidyverse_1.3.0       WGCNA_1.69            fastcluster_1.1.25   
+[13] dynamicTreeCut_1.63-1
+
+loaded via a namespace (and not attached):
+ [1] nlme_3.1-147          matrixStats_0.56.0    fs_1.4.1             
+ [4] lubridate_1.7.8       bit64_0.9-7           doParallel_1.0.15    
+ [7] RColorBrewer_1.1-2    httr_1.4.1            tools_4.0.0          
+[10] backports_1.1.6       R6_2.4.1              rpart_4.1-15         
+[13] Hmisc_4.4-0           DBI_1.1.0             BiocGenerics_0.34.0  
+[16] colorspace_1.4-1      nnet_7.3-14           withr_2.2.0          
+[19] tidyselect_1.0.0      gridExtra_2.3         bit_1.1-15.2         
+[22] compiler_4.0.0        preprocessCore_1.50.0 cli_2.0.2            
+[25] rvest_0.3.5           Biobase_2.48.0        htmlTable_1.13.3     
+[28] xml2_1.3.2            scales_1.1.0          checkmate_2.0.0      
+[31] digest_0.6.25         foreign_0.8-79        base64enc_0.1-3      
+[34] jpeg_0.1-8.1          pkgconfig_2.0.3       htmltools_0.4.0      
+[37] dbplyr_1.4.3          htmlwidgets_1.5.1     rlang_0.4.5          
+[40] readxl_1.3.1          rstudioapi_0.11       RSQLite_2.2.0        
+[43] impute_1.62.0         generics_0.0.2        jsonlite_1.6.1       
+[46] acepack_1.4.1         magrittr_1.5          GO.db_3.11.4         
+[49] Formula_1.2-3         Matrix_1.2-18         fansi_0.4.1          
+[52] Rcpp_1.0.4.6          munsell_0.5.0         S4Vectors_0.26.1     
+[55] lifecycle_0.2.0       stringi_1.4.6         grid_4.0.0           
+[58] blob_1.2.1            parallel_4.0.0        crayon_1.3.4         
+[61] lattice_0.20-41       haven_2.2.0           splines_4.0.0        
+[64] hms_0.5.3             knitr_1.28            pillar_1.4.3         
+[67] codetools_0.2-16      stats4_4.0.0          reprex_0.3.0         
+[70] glue_1.4.0            latticeExtra_0.6-29   data.table_1.12.8    
+[73] modelr_0.1.6          png_0.1-7             vctrs_0.2.4          
+[76] foreach_1.5.0         cellranger_1.1.0      gtable_0.3.0         
+[79] assertthat_0.2.1      xfun_0.13             broom_0.5.6          
+[82] roxygen2_7.1.0        survival_3.1-12       iterators_1.0.12     
+[85] AnnotationDbi_1.50.3  memoise_1.1.0         IRanges_2.22.2       
+[88] cluster_2.1.0         ellipsis_0.3.0       
