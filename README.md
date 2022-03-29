@@ -59,8 +59,8 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: GO master file, downloaded from TAIR, output directory path
 	- Outputs: `ArabidopsisGene_w_GO.tsv`, each Arabidopsis gene and its corresponding GO terms, filtered down so it can be used as an input in TopGO
 - `topGO_blueberry.R`: Runs TopGO
-	- Inputs: Folder of modules in Arabidposis gene format, `TODO`: Tsv containing?, output directory, documentation directory
-	- Outputs: `TODO`: ???, session info 
+	- Inputs: Folder of modules in Arabidposis gene format, filtered GO output from `generate_gene_w_GO_term.py`, output directory, documentation directory
+	- Outputs: Table of GO terms (grouped by CC, MF, and BP) and their level of overrepresentation per module ID, session info (described below)
 	- Version Control: `requirements/TopGO_sessionInfo.txt`
 
 ##  gene\_stats TODO:
