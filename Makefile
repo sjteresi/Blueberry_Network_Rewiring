@@ -78,6 +78,7 @@ topGO:
 
 #----------------------------------------#
 # Master summary table
+# TODO update for paths f results and data
 summary_table:
 	mkdir -p $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 	python $(ROOT_DIR)/src/summary_table.py \
@@ -100,6 +101,14 @@ gene_stats_all:    # execute gene stats
 generate_exp_table_melanie:
 	mkdir -p $(DEV_RESULTS)/melanie_exp_syn_table
 	python3 $(ROOT_DIR)/src/exp_table_melanie.py $(DEV_DATA)/FPKM/Blueberry_FPKM_All.tsv $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv $(DEV_RESULTS)/melanie_exp_syn_table
+
+# Filter Log2FC
+log_2fc:
+	mkdir -p $(DEV_RESULTS)/Log_2FC_Melanie
+	python $(ROOT_DIR)/src/Log_2FC_Melanie/module_representation_log_2FC.py \
+	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
+	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
+	       $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv \
 
 
 sync_local_to_remote_data:
