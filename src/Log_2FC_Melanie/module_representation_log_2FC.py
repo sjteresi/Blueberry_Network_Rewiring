@@ -148,6 +148,12 @@ def calc_gene_counts_per_module(blueberry_genes_and_module_colors_table):
     return table_of_counts
 
 
+def interrogate_max_final_results(final):
+    print(final)
+    print(final.idxmax())
+    print(final.max())
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
 
@@ -254,3 +260,4 @@ if __name__ == "__main__":
     final.to_csv(
         os.path.join(output_path, "Melanie_Log_2FC_Filtered.tsv"), sep="\t", header=True
     )
+    interrogate_max_final_results(final)
