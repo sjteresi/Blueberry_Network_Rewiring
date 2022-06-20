@@ -6,7 +6,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DEV_DATA := $(ROOT_DIR)/data
 DEV_RESULTS := $(ROOT_DIR)/results
 DEV_DOCUMENTATION := $(ROOT_DIR)/doc
-DEV_DIFFEXDIR := $(DEV_DATA)/Diff_Ex/EdgeR_Output
+DEV_DIFFEXDIR := $(ROOT_DIR)/../Blueberry_RNA_Seq_Expression_Analysis/results/Diff_Ex/EdgeR_Output
 
 DEV_GENE_ANNOTATION := $(DEV_DATA)/V_corymbosum_v1.0_geneModels.gff
 
@@ -110,9 +110,11 @@ log_2fc:
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
 	       $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv \
 
-
 sync_local_to_remote_data:
 	rsync -ave ssh /home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/data --chmod=Dg+s teresisc@rsync.hpcc.msu.edu:/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/
 
 sync_local_to_remote_results:
 	rsync -ave ssh /home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/results --chmod=Dg+s teresisc@rsync.hpcc.msu.edu:/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/
+
+create_module_table:
+	$(ROOT_DIR)/src/modules/make_module_deg_table.py $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv $(DEV_DIFFEXDIR)/ "All_Hap" "FDR" $(DEV_RESULTS)/Modules
