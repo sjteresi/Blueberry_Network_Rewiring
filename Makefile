@@ -118,3 +118,6 @@ sync_local_to_remote_results:
 
 create_module_table:
 	$(ROOT_DIR)/src/modules/make_module_deg_table.py $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv $(DEV_DIFFEXDIR)/ "All_Hap" "FDR" $(DEV_RESULTS)/Modules
+
+create_Log_2FC_histogram:
+	$(ROOT_DIR)/src/modules/log2fc_hist.py $(DEV_RESULTS)/Log_2FC_Melanie/Melanie_Log_2FC_Filtered.tsv $(DEV_RESULTS)/Log_2FC_Melanie/histograms.png
