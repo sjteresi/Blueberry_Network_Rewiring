@@ -26,8 +26,12 @@ if __name__ == "__main__":
     fig.patch.set_facecolor("white")
 
     i = 0
-    for col in data.columns[1:29]:
+    for col in data.columns[1:29]:  # Magic
         axes[i].title.set_text(col)
         axes[i].hist(data[col])
         i += 1
+    fig.suptitle("Distribution of connection strengths\n between modules and comparisons", fontsize=80)
+    fig.supxlabel("Percent Expression", fontsize=50)
+    fig.supylabel("Count", fontsize=50)
+
     plt.savefig(output)
