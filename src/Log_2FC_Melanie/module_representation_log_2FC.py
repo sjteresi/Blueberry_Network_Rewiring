@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Filter Log2FC gene representation data
+Filter Log2FC gene representation data. Determine overlap with modules from
+WGCNA.
 """
 
 __author__ = "Scott Teresi"
@@ -9,8 +10,8 @@ __author__ = "Scott Teresi"
 import argparse
 import coloredlogs
 import logging
+import numpy as np
 import pandas as pd
-import re
 import os
 from functools import reduce
 
@@ -33,7 +34,8 @@ def read_log_2fc_dir(input_directory):
     only_log2fc_files = [
         os.path.join(input_directory, f)
         for f in os.listdir(input_directory)
-        if (os.path.isfile(os.path.join(input_directory, f))) and ("_FC.tsv" in f)
+        if (os.path.isfile(os.path.join(input_directory, f)))
+        and ("Log2_fold_changes" in f)
     ]  # MAGIC substring for filename recognition
     if len(only_log2fc_files) != 14:
         raise ValueError
@@ -66,7 +68,11 @@ def count_direction_of_regulation_per_module(all_merged):
     Converts the Log2FC columns of all_merged into counts per module. Index is
     now the module ID not the gene.
     """
-    unwanted_columns = ["Blueberry_Gene", "Module_Color"]
+    unwanted_columns = [
+        "Blueberry_Gene",
+        "Module_Color",
+        "Number_of_Blueberry_Genes_in_Module",
+    ]
     columns_of_direction = all_merged.columns.to_list()
     columns_of_direction = [
         column_name
@@ -77,10 +83,9 @@ def count_direction_of_regulation_per_module(all_merged):
     counts_per_module_comparison = []
     for direction_column in columns_of_direction:
         x = (
-            all_merged.groupby("Module_Color")[direction_column]
+            all_merged.groupby(by="Module_Color", dropna=True)[direction_column]
             .value_counts()
             .unstack()
-            .drop(columns="NA")
         )
         comparison_name = x.columns.name
         x = x.add_prefix(comparison_name + "_")
@@ -93,34 +98,6 @@ def count_direction_of_regulation_per_module(all_merged):
         counts_per_module_comparison,
     )
     return y
-
-
-def count_direction_of_regulation(log_2fc_file):
-    """
-    Takes a Log2FC file, (received from Melanie and read in as a pandas
-    DataFrame, and determines the direction of regulation. It converts negative
-    float values to 'Down' and positive float values to 'Up'.
-
-    Args:
-        log_2fc_file (pandas.DataFrame): An individual output of
-        read_all_log_2fc_files
-
-    Returns:
-        log_2fc_file (pandas.DataFrame)
-    """
-    value_column = [col for col in log_2fc_file.columns if "_FC" in col]
-    if len(value_column) > 1:
-        raise ValueError
-    value_column = value_column[0]
-    log_2fc_file.loc[
-        log_2fc_file[value_column] > 0, [value_column + "_Direction"]
-    ] = "Up"
-    log_2fc_file.loc[
-        log_2fc_file[value_column] < 0, [value_column + "_Direction"]
-    ] = "Down"
-    log_2fc_file.drop(columns=[value_column], inplace=True)  # drop the float
-    # val column now that we have gotten the new column
-    return log_2fc_file
 
 
 def calc_gene_counts_per_module(blueberry_genes_and_module_colors_table):
@@ -148,10 +125,21 @@ def calc_gene_counts_per_module(blueberry_genes_and_module_colors_table):
     return table_of_counts
 
 
-def interrogate_max_final_results(final):
-    print(final)
-    print(final.idxmax())
-    print(final.max())
+def top_five_modules_and_percent_per_context(final):
+    """
+    TODO fill in
+    Output top 5 module ID's for percent genes recovered
+    """
+    percent_columns = [f for f in final.columns if "Number" not in f]
+    for percent_col in percent_columns:
+        top_five = final.nlargest(5, columns=[percent_col])
+        top_five = top_five.loc[:, top_five.columns.isin([percent_col])]
+        top_five.to_csv(
+            os.path.join(output_dir, str(percent_col + ".tsv")),
+            header=True,
+            index=True,
+            sep="\t",
+        )
 
 
 if __name__ == "__main__":
@@ -173,17 +161,19 @@ if __name__ == "__main__":
         type=str,
         help="file representing the blueberry genes and their Arabidopsis orthologs",
     )
+    # NB set args
     args = parser.parse_args()
     args.log_2fc_dir = os.path.abspath(args.log_2fc_dir)
     args.genes_and_module_colors = os.path.abspath(args.genes_and_module_colors)
     args.synteny_homology_table = os.path.abspath(args.synteny_homology_table)
-    output_path = os.path.abspath(args.log_2fc_dir)
+    output_dir = os.path.abspath(args.log_2fc_dir)
 
+    # NB set logging
     log_level = logging.INFO
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
 
-    # Read the datasets
+    # NOTE read the input datasets
     synteny_homology_table = read_synteny_homology_table(args.synteny_homology_table)
     blueberry_genes_and_module_colors_table = read_gene_modules_table(
         args.genes_and_module_colors
@@ -191,73 +181,84 @@ if __name__ == "__main__":
     gene_counts_per_module = calc_gene_counts_per_module(
         blueberry_genes_and_module_colors_table
     )
-    # NOTE, at this point the WGCNA data is fully read and we have the number
-    # of genes per module.
-
     list_log_2fc_files = read_log_2fc_dir(args.log_2fc_dir)
     pandas_log_2fc_files = read_all_log_2fc_files(list_log_2fc_files)
-    pandas_log_2fc_files_w_status = [
-        count_direction_of_regulation(x) for x in pandas_log_2fc_files
-    ]
 
-    # NOTE, at this point I also have filtered Log2FC files from Melanie that
-    # have a string for the direction (up, down)
-
+    # NOTE begin the analysis
     # NB do a pandas merge over a list, merge all the log2fc files (which have
     # different columns), but a common blueberry gene column
-    log_merged = reduce(
+    log_merged_float_format = reduce(
         lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
         pandas_log_2fc_files,
     )
-    log_merged.fillna("NA", inplace=True)  # NB this should fill in the
-    # locations where a gene wasn't present in one comparison, but is present
-    # in another. This file is the direction files all merged together
 
-    # NOTE, now merge with the filtered WGCNA data that has been transformed to
-    # have gene counts.
-    all_merged = pd.merge(
-        log_merged,
+    # NB list of expression contexts (important columns) for help later
+    expression_contexts = log_merged_float_format.columns.to_list()
+    expression_contexts.remove("Blueberry_Gene")
+
+    # NOTE, this is the merger of the blueberry genes, their module IDs, and
+    # the multiple log2FC files received from Melanie.
+    all_merged_float = pd.merge(
+        log_merged_float_format,
         blueberry_genes_and_module_colors_table,
         on="Blueberry_Gene",
         how="outer",
     )
 
-    # NB there are some genes in the the blueberry modules dataset that were
-    # never recovered in the log2fc dataset, fill those with NA. Could change
-    # the 'how' keyword argument to 'left' to not add the extra genes.
-    all_merged.fillna("NA", inplace=True)
-
-    # NB key step, convert all_merged's down and up values into counts per
-    # module
-    direction_counts_per_context = count_direction_of_regulation_per_module(all_merged)
-
-    direction_counts_per_context_and_gene_counts_per_module = pd.merge(
-        direction_counts_per_context,
-        gene_counts_per_module,
-        on="Module_Color",
-        how="outer",
-    )
-    direction_counts_per_context_and_gene_counts_per_module.set_index(
-        "Module_Color", inplace=True
+    # NB add the number of genes per module to the main table
+    all_merged_float = all_merged_float.merge(
+        gene_counts_per_module, on="Module_Color", how="outer"
     )
 
-    percentages = direction_counts_per_context_and_gene_counts_per_module.apply(
+    # NOTE
+    # Convert positive values in Melanie's log2FC data to the string 'Up' and
+    # take the negative values and convert them to 'Down'. This will help in
+    # performing a value_counts() function later.
+    for column in expression_contexts:
+        all_merged_float.loc[
+            all_merged_float[column] < 0, column + "_Direction"
+        ] = "Down"
+
+        all_merged_float.loc[all_merged_float[column] > 0, column + "_Direction"] = "Up"
+
+        all_merged_float.loc[
+            all_merged_float[column].notna(), column
+        ] = "Total_Regulated"
+
+    # NB perform the value counts
+    counts_per_module = count_direction_of_regulation_per_module(all_merged_float)
+
+    # Get the gene counts per module information again because it was lost in
+    # the previous function.
+    counts_per_module = counts_per_module.merge(
+        gene_counts_per_module, on="Module_Color", how="outer"
+    )
+    counts_per_module.set_index("Module_Color", inplace=True)
+
+    # Divide to get the percentage
+    percentages = counts_per_module.apply(
         lambda row: row / row["Number_of_Blueberry_Genes_in_Module"], axis=1
     )  # NB calculate percent, make it a new pandas dataframe
     percentages.drop(
         columns=["Number_of_Blueberry_Genes_in_Module"], inplace=True
     )  # NB remove column
     percentages = percentages.add_prefix("Percent_")  # NB add prefix to column
-    # names
 
-    final = direction_counts_per_context_and_gene_counts_per_module.add_prefix(
-        "Number_Genes_"
-    )  # NB add prefix to column names for the
-    # gene counts
-
-    # NOTE merge all for final result
-    final = pd.merge(percentages, final, on="Module_Color", how="outer")
-    final.to_csv(
-        os.path.join(output_path, "Melanie_Log_2FC_Filtered.tsv"), sep="\t", header=True
+    # NOTE FUTURE
+    # Get gene counts per module again because the number of blueberry genes
+    # per module column was set to 1 because of division, in future figure out
+    # how to do if else statements in pandas apply lambda. Not sure how to keep
+    # it from acting on a specific column, would I first need to provide a
+    # mask instead of doing if else?
+    percentages = percentages.merge(
+        gene_counts_per_module, on="Module_Color", how="outer"
     )
-    interrogate_max_final_results(final)
+    percentages.fillna(np.nan, inplace=True)
+    percentages.set_index("Module_Color", inplace=True)
+    top_five_modules_and_percent_per_context(percentages)
+    percentages.to_csv(
+        os.path.join(output_dir, "Melanie_Log_2FC_Filtered.tsv"),
+        sep="\t",
+        header=True,
+        index=False,
+    )
