@@ -15,7 +15,6 @@ import pandas as pd
 import os
 from functools import reduce
 
-from src.modules.filter_modules import read_synteny_homology_table
 from src.modules.filter_modules import read_gene_modules_table
 
 
@@ -63,7 +62,7 @@ def read_all_log_2fc_files(list_log_2fc_files):
     return list_of_log_2fc_files_read
 
 
-def count_direction_of_regulation_per_module(all_merged):
+def count_direction_of_regulation_per_module_log2fc(all_merged):
     """
     Converts the Log2FC columns of all_merged into counts per module. Index is
     now the module ID not the gene.
@@ -82,6 +81,7 @@ def count_direction_of_regulation_per_module(all_merged):
 
     counts_per_module_comparison = []
     for direction_column in columns_of_direction:
+        # TODO set a better variable name
         x = (
             all_merged.groupby(by="Module_Color", dropna=True)[direction_column]
             .value_counts()
@@ -97,6 +97,7 @@ def count_direction_of_regulation_per_module(all_merged):
         lambda left, right: pd.merge(left, right, on="Module_Color", how="outer"),
         counts_per_module_comparison,
     )
+    # TODO set a better variable name
     return y
 
 
@@ -125,14 +126,14 @@ def calc_gene_counts_per_module(blueberry_genes_and_module_colors_table):
     return table_of_counts
 
 
-def top_five_modules_and_percent_per_context(final):
+def top_n_modules_and_percent_per_context(final, output_dir, n=5):
     """
     TODO fill in
     Output top 5 module ID's for percent genes recovered
     """
     percent_columns = [f for f in final.columns if "Number" not in f]
     for percent_col in percent_columns:
-        top_five = final.nlargest(5, columns=[percent_col])
+        top_five = final.nlargest(n, columns=[percent_col])
         top_five = top_five.loc[:, top_five.columns.isin([percent_col])]
         top_five.to_csv(
             os.path.join(output_dir, str(percent_col + ".tsv")),
@@ -157,16 +158,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "synteny_homology_table",
+        "output_dir",
         type=str,
-        help="file representing the blueberry genes and their Arabidopsis orthologs",
+        help="output_dir",
     )
     # NB set args
     args = parser.parse_args()
     args.log_2fc_dir = os.path.abspath(args.log_2fc_dir)
     args.genes_and_module_colors = os.path.abspath(args.genes_and_module_colors)
-    args.synteny_homology_table = os.path.abspath(args.synteny_homology_table)
-    output_dir = os.path.abspath(args.log_2fc_dir)
+    output_dir = os.path.abspath(args.output_dir)
 
     # NB set logging
     log_level = logging.INFO
@@ -174,7 +174,6 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     # NOTE read the input datasets
-    synteny_homology_table = read_synteny_homology_table(args.synteny_homology_table)
     blueberry_genes_and_module_colors_table = read_gene_modules_table(
         args.genes_and_module_colors
     )
@@ -211,22 +210,26 @@ if __name__ == "__main__":
     )
 
     # NOTE
-    # Convert positive values in Melanie's log2FC data to the string 'Up' and
-    # take the negative values and convert them to 'Down'. This will help in
-    # performing a value_counts() function later.
+    # Convert positive values in Melanie's log2FC data to a new col with
+    # string 'Up' and take the negative values and convert them to a new col
+    # with string 'Down'. This will help in performing a value_counts() function
+    # later. Take the old column of float values and convert to the string
+    # 'Total_Regulated'.
+
+    # TODO put this in a function or something
     for column in expression_contexts:
         all_merged_float.loc[
             all_merged_float[column] < 0, column + "_Direction"
         ] = "Down"
-
         all_merged_float.loc[all_merged_float[column] > 0, column + "_Direction"] = "Up"
-
         all_merged_float.loc[
             all_merged_float[column].notna(), column
         ] = "Total_Regulated"
 
     # NB perform the value counts
-    counts_per_module = count_direction_of_regulation_per_module(all_merged_float)
+    counts_per_module = count_direction_of_regulation_per_module_log2fc(
+        all_merged_float
+    )
 
     # Get the gene counts per module information again because it was lost in
     # the previous function.
@@ -255,9 +258,9 @@ if __name__ == "__main__":
     )
     percentages.fillna(np.nan, inplace=True)
     percentages.set_index("Module_Color", inplace=True)
-    top_five_modules_and_percent_per_context(percentages)
+    top_n_modules_and_percent_per_context(percentages, output_dir)
     percentages.to_csv(
-        os.path.join(output_dir, "Melanie_Log_2FC_Filtered.tsv"),
+        os.path.join(output_dir, "Log2FC_percentages_in_modules.tsv"),
         sep="\t",
         header=True,
         index=False,
