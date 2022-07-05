@@ -49,11 +49,15 @@ def import_homologs(homolog_input_file):
     # Get the correct name for the arabidopsis genes
     gene_data["Subject"] = gene_data["Subject"].str.split("\|\|").str[3]
 
+    gene_data.loc[gene_data['Subject'] == 'AT1G30530']
+    print(gene_data)
+    raise ValueError
+
     # Get the correct name for the blueberry genes
     gene_data["Query"] = gene_data["Query"].str.split("-mRNA-1").str[0]
 
     # Trim E-values less than 0.05
-    gene_data = gene_data.loc[gene_data["E_Value"] < 0.05]
+    gene_data = gene_data.loc[gene_data["E_Value"] < 0.000000000000000000001]
 
     # Sort by Name and E-Values
     gene_data.sort_values(by=["Query", "E_Value"], ascending=(True, True), inplace=True)
