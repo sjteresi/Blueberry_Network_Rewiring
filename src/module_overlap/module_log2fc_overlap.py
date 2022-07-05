@@ -263,5 +263,5 @@ if __name__ == "__main__":
         os.path.join(output_dir, "Log2FC_percentages_in_modules.tsv"),
         sep="\t",
         header=True,
-        index=False,
+        index=True,
     )
