@@ -13,6 +13,7 @@ import logging
 import numpy as np
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 from functools import reduce
 
 from src.modules.filter_modules import read_gene_modules_table
@@ -202,6 +203,69 @@ def count_direction_of_regulation_per_module_deg(all_merged):
     return counts
 
 
+def line_plot_counts(merged_deg_no_module_ID, output_dir):
+    """TODO"""
+
+    all_columns = merged_deg_no_module_ID.columns.to_list()
+    all_columns.remove("Blueberry_Gene")
+    merged_deg_no_module_ID.set_index("Blueberry_Gene", inplace=True)
+    data = merged_deg_no_module_ID.apply(pd.value_counts)
+    data.fillna(0, inplace=True)
+    columns = sorted(data.columns.to_list())
+    only_draper = [genome for genome in columns if "LIB" not in genome]
+    only_liberty = [genome for genome in columns if "DRA" not in genome]
+
+    # Draper
+    draper_count_sequence = data[only_draper]
+    down_sequence_draper = draper_count_sequence.loc["Down"].to_list()
+    up_sequence_draper = draper_count_sequence.loc["Up"].to_list()
+
+    # Liberty
+    liberty_count_sequence = data[only_liberty]
+    down_sequence_liberty = liberty_count_sequence.loc["Down"].to_list()
+    up_sequence_liberty = liberty_count_sequence.loc["Up"].to_list()
+
+    x_range = ["C" + str(i) + " vs. " + "T" + str(i) for i in range(1, 8, 1)]
+    M = 10
+    plt.figure(figsize=(16, 9.5))
+    plt.plot(
+        x_range,
+        up_sequence_draper,
+        "^b:",
+        label="Up-Regulated in Resistant Genotype (Draper)",
+        markersize=M,
+    )
+    plt.plot(
+        x_range,
+        down_sequence_draper,
+        "vb-",
+        label="Down-Regulated in Resistant Genotype (Draper)",
+        markersize=M,
+    )
+    plt.plot(
+        x_range,
+        up_sequence_liberty,
+        "^r:",
+        label="Up-Regulated in Susceptible Genotype (Liberty)",
+        markersize=M,
+    )
+    plt.plot(
+        x_range,
+        down_sequence_liberty,
+        "vr-",
+        label="Down-Regulated in Susceptible Genotype (Liberty)",
+        markersize=M,
+    )
+    plt.ylabel("Number of Genes")
+    plt.xlabel("Comparison Context")
+    plt.title("Number of Genes Differentially Expressed Per Context")
+    plt.legend()
+    plt.savefig(
+        os.path.join(output_dir, "Lineplot_number_diffex_genes_per_context.png"),
+        bbox_inches="tight",
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("DEG_dir", type=str, help="output from EdgeR")
@@ -239,6 +303,8 @@ if __name__ == "__main__":
         lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
         list_of_deg_pandas,
     )
+
+    line_plot_counts(merged_deg_no_module_ID, args.output_dir)
 
     merged_deg_w_module_ID = pd.merge(
         merged_deg_no_module_ID,
