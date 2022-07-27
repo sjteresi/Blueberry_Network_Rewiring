@@ -33,7 +33,6 @@ def read_GO_dir(input_directory):
     Returns:
         go_files (list): List of absolute file paths
     """
-
     go_files = [
         os.path.join(input_directory, f)
         for f in os.listdir(input_directory)
@@ -53,9 +52,8 @@ def read_GO_file(go_files):
         of file paths.
 
     Returns:
-        list_of_read_go_files (list): List of pandas dataframes
     """
-    list_of_read_go_files = []
+    my_dict = {}  # TODO refactor, because I am basically
     for go_file_path in go_files:
         individual_go_panda = pd.read_csv(go_file_path, sep="\t", header="infer")
         individual_go_panda.rename(
@@ -93,9 +91,13 @@ def read_GO_file(go_files):
 
         individual_go_panda["GO_Term_Type"] = analysis_type
         individual_go_panda[module_name] = "Recovered"
-        list_of_read_go_files.append(individual_go_panda)
 
-    return list_of_read_go_files
+        # TODO refactor
+        if module_name not in my_dict:
+            my_dict[module_name] = []
+        my_dict[module_name].append(individual_go_panda)
+
+    return my_dict
 
 
 def read_interesting_GO_terms(input_path):
@@ -134,16 +136,21 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     go_file_paths = read_GO_dir(args.go_dir)
-    all_go_list = read_GO_file(go_file_paths)
+    the_dictionary = read_GO_file(go_file_paths)
+
+    # Need to concat the files if they have the same columns
+    all_go_list = [pd.concat(val) for key, val in the_dictionary.items()]
 
     # Perform a pandas merge on a list
     all_go_merged = reduce(
         lambda left, right: pd.merge(
-            left, right, on=["GO_ID", "GO_TERM", "GO_Term_Type"], how="outer"
+            left,
+            right,
+            on=["GO_ID", "GO_TERM", "GO_Term_Type"],
+            how="outer",
         ),
         all_go_list,
     )
-
     all_go_merged.fillna("Not_Recovered", inplace=True)
 
     interesting_go_terms = read_interesting_GO_terms(args.interesting_go_terms)
@@ -153,10 +160,19 @@ if __name__ == "__main__":
     ]
 
     # Perform a simple sort
+    # col_to_sort = [
+    # col for col in interesting_go_term_info.columns.to_list() if "GO" not in col
+    # ]
+    # print(interesting_go_term_info.sort_values(by=col_to_sort, ascending=False))
     interesting_go_terms = interesting_go_terms.sort_values(
         by=["GO_ID"], ascending=True
     )
 
+    # print(
+    # interesting_go_term_info.loc[
+    # interesting_go_term_info["turquoise"] == "Recovered"
+    # ]
+    # )
     interesting_go_term_info.to_csv(
         os.path.join(args.output_dir, "Interesting_GO_Term_Module_Representation.tsv"),
         sep="\t",
