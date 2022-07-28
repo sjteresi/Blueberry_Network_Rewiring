@@ -81,12 +81,25 @@ The code is broken up into several different scripts inside the `src/` directory
 ## Python Requirements:
 We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`.
 
-# Other:
-## Identifying Syntelogs:
-This section describes the methods to run [SynMap](https://genomevolution.org/CoGe/SynMap.pl) on CoGe. I ran SynMap with mostly [default options](https://genomevolution.org/wiki/index.php/SynMap), I did change one option: under *Merge Syntenic Blocks* I set it to `Quota Align Merge`. Here is the [link](https://genomevolution.org/r/1ejoj) to regenerate the analysis on CoGe.
+# Methods Descriptions:
+## Ortholog Identification
+Genome-wide analyses were performed to identify *Arabidopsis thaliana* – *Vaccinium corymbosum* orthologs using a combination of synteny- and BLAST- based approaches using SynMap and reciprocal BLASTp analyses (protein databases).
+Ortholog pairs with E-values greater than or equal to 0.05 were excluded from both datasets.
+In the event that SynMap or BLASTp returned multiple Arabidopsis genes for a single blueberry gene, the Arabidopsis ortholog with the best (lowest) E-value score was kept.
+In the event that a blueberry gene had an ortholog identified through BLASTp and SynMap, we gave priority to the SynMap synteny results, preferentially keeping that ortholog pair.
 
-## Identifying Homologs:
-We are doing this step to identify homologs that may have been missed using a synteny-based approach. Genes that could have been missed by the synteny search include single-gene transpositions (and others). We are going to use a BLAST database of protein predictions. First we generate a BLAST database and prepare it for protein indices. Then we can run the BLAST algorithm on the two sequence files, this may take awhile. For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
+### SynMap for Syntelogs:
+[SynMap](https://genomevolution.org/CoGe/SynMap.pl) was run on the CoGe website. I ran SynMap with mostly [default options](https://genomevolution.org/wiki/index.php/SynMap), I did change one option: under *Merge Syntenic Blocks* I set it to `Quota Align Merge`. Here is the [link](https://genomevolution.org/r/1ejoj) to regenerate the analysis on CoGe.
+
+### BLASTp for Homologs:
+We are doing this step to identify homologs that may have been missed using a synteny-based approach.
+Genes that could have been missed by the synteny search include single-gene transpositions (and others).
+We are going to use a BLAST database of protein predictions.
+First we generate a BLAST database and prepare it for protein indices.
+Then we can run the BLAST algorithm on the two sequence files, this may take awhile.
+For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
+
+TODO the blastp database was generated via...
 
 ## Project News:
 [Combating the blueberry stem gall wasp](https://www.canr.msu.edu/news/combating-the-blueberry-stem-gall-wasp#:~:text=The%20blueberry%20stem%20gall%20wasp%20is%20a%20tiny%20insect%20that,shoot%20and%20decreases%20fruit%20production.)
