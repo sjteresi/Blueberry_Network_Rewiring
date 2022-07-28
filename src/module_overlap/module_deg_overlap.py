@@ -3,6 +3,10 @@
 """
 Filter DEG representation data. Determine overlap with modules from
 WGCNA.
+
+Create a line plot of DEGs over the time points
+Create a Venn Diagram of DEGs over the time points to see overlap between
+Liberty and Draper datasets
 """
 
 __author__ = "Scott Teresi"
@@ -14,6 +18,7 @@ import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn2_circles, venn2_unweighted
 from functools import reduce
 
 from src.modules.filter_modules import read_gene_modules_table
@@ -203,9 +208,137 @@ def count_direction_of_regulation_per_module_deg(all_merged):
     return counts
 
 
-def line_plot_counts(merged_deg_no_module_ID, output_dir):
-    """TODO"""
+def get_counts_of_unique_and_non_unique_genes_per_comparison(
+    merged_deg_no_module_ID, draper_col, liberty_col
+):
+    """
+    Gets the counts of unique and non-unique DEGs per genotype comparison.
+    Basically does Draper C1 and T1 vs Liberty C1 and T1. I am grouping the
+    DEGs of up and down for each genotype to get the overall. Then I use set
+    terminology to determine which genes are shared and unshared for each
+    comparison.
 
+    Args:
+        merged_deg_no_module_ID (pandas.Data.Frame): Pandas dataframe of
+        blueberry genes and DEG comparison columns. Values are Down, Up, or
+        No_Change to signify what kind of DEG a gene is.
+            Columns:
+                Blueberry_Gene: Object, dtype: object
+                Expression Contexts (MAGIC VARIES): Object: dtype: object
+
+        draper_col (str): String of column name to subset out of the
+        merged_deg_no_module_ID pandas dataframe
+
+        liberty_col (str): String of column name to subset out of the
+        merged_deg_no_module_ID pandas dataframe
+
+    Returns:
+        awful tuple lol please refactor if using in the future:
+            count_of_common_genes (int):
+            count_of_unique_draper_genes (int)
+            count_of_unique_liberty_genes (int)
+    """
+    # Get smaller panda dataframes with only the relevant data
+    all_changes_draper_series = merged_deg_no_module_ID[draper_col].loc[
+        merged_deg_no_module_ID[draper_col] != "No_Change"
+    ]
+    all_changes_liberty_series = merged_deg_no_module_ID[liberty_col].loc[
+        merged_deg_no_module_ID[liberty_col] != "No_Change"
+    ]
+    common_genes = set(all_changes_draper_series.index).intersection(
+        set(all_changes_liberty_series.index)
+    )
+    count_of_common_genes = len(common_genes)
+    count_of_unique_draper_genes = (
+        len(all_changes_draper_series) - count_of_common_genes
+    )
+    count_of_unique_liberty_genes = (
+        len(all_changes_liberty_series) - count_of_common_genes
+    )
+    return (
+        count_of_common_genes,
+        count_of_unique_draper_genes,
+        count_of_unique_liberty_genes,
+    )
+
+
+def graph_venn_diagram_deg_per_context(merged_deg_no_module_ID, output_dir):
+    """
+    Create a Venn diagram of the TOTAL DEGs for each genotype at each stage.
+
+    Args:
+        merged_deg_no_module_ID (pandas.Data.Frame): Pandas dataframe of
+        blueberry genes and DEG comparison columns. Values are Down, Up, or
+        No_Change to signify what kind of DEG a gene is.
+            Columns:
+                Blueberry_Gene: Object, dtype: object
+                Expression Contexts (MAGIC VARIES): Object: dtype: object
+
+        output_dir (str): Path
+
+    Returns: None, just makes graphs and saves them to the output dir.
+    """
+    all_columns = merged_deg_no_module_ID.columns.to_list()
+    all_columns.remove("Blueberry_Gene")
+    merged_deg_no_module_ID.set_index("Blueberry_Gene", inplace=True)
+    columns = sorted(merged_deg_no_module_ID.columns.to_list())
+    only_draper_colnames = [genome for genome in columns if "LIB" not in genome]
+    only_liberty_colnames = [genome for genome in columns if "DRA" not in genome]
+
+    for draper_col, liberty_col in zip(only_draper_colnames, only_liberty_colnames):
+        (
+            count_of_common_genes,
+            count_of_unique_draper_genes,
+            count_of_unique_liberty_genes,
+        ) = get_counts_of_unique_and_non_unique_genes_per_comparison(
+            merged_deg_no_module_ID, draper_col, liberty_col
+        )
+        day_number = int(draper_col.rstrip("_Direction")[-1])  # MAGIC
+        # Magic number just to get the Day integer
+        comparison_name = (
+            "Day %s: All DEGS of Resistant Genotype (Draper) vs. All DEGs of Susceptible Genotype (Liberty)"
+            % day_number
+        )
+
+        the_labels = ("Unique Draper DEGs", "Unique Liberty DEGs")
+        venn2(
+            subsets=(
+                count_of_unique_draper_genes,
+                count_of_unique_liberty_genes,
+                count_of_common_genes,
+            ),
+            set_colors=("b", "r"),
+            set_labels=the_labels,
+        )
+
+        # Add another set to make the edges bold. Purely cosmetic
+        venn2_circles(
+            subsets=(
+                count_of_unique_draper_genes,
+                count_of_unique_liberty_genes,
+                count_of_common_genes,
+            )
+        )
+        plt.title(comparison_name)
+        plt.savefig(
+            os.path.join(output_dir, "Day" + str(day_number) + "_DEG_VennDiagram.png"),
+            bbox_inches="tight",
+        )
+        plt.clf()
+
+
+def graph_line_plot_deg_per_context(merged_deg_no_module_ID, output_dir):
+    """
+    Args:
+        merged_deg_no_module_ID (pandas.Data.Frame): Pandas dataframe of
+        blueberry genes and DEG comparison columns. Values are Down, Up, or
+        No_Change to signify what kind of DEG a gene is.
+            Columns:
+                Blueberry_Gene: Object, dtype: object
+                Expression Contexts (MAGIC VARIES): Object: dtype: object
+
+        output_dir (str): Path
+    """
     all_columns = merged_deg_no_module_ID.columns.to_list()
     all_columns.remove("Blueberry_Gene")
     merged_deg_no_module_ID.set_index("Blueberry_Gene", inplace=True)
@@ -216,14 +349,14 @@ def line_plot_counts(merged_deg_no_module_ID, output_dir):
     only_liberty = [genome for genome in columns if "DRA" not in genome]
 
     # Draper
-    draper_count_sequence = data[only_draper]
-    down_sequence_draper = draper_count_sequence.loc["Down"].to_list()
-    up_sequence_draper = draper_count_sequence.loc["Up"].to_list()
+    draper_count_dataframe = data[only_draper]
+    down_sequence_draper = draper_count_dataframe.loc["Down"].to_list()
+    up_sequence_draper = draper_count_dataframe.loc["Up"].to_list()
 
     # Liberty
-    liberty_count_sequence = data[only_liberty]
-    down_sequence_liberty = liberty_count_sequence.loc["Down"].to_list()
-    up_sequence_liberty = liberty_count_sequence.loc["Up"].to_list()
+    liberty_count_dataframe = data[only_liberty]
+    down_sequence_liberty = liberty_count_dataframe.loc["Down"].to_list()
+    up_sequence_liberty = liberty_count_dataframe.loc["Up"].to_list()
 
     x_range = ["C" + str(i) + " vs. " + "T" + str(i) for i in range(1, 8, 1)]
     M = 10
@@ -261,7 +394,7 @@ def line_plot_counts(merged_deg_no_module_ID, output_dir):
     plt.title("Number of Genes Differentially Expressed Per Context")
     plt.legend()
     plt.savefig(
-        os.path.join(output_dir, "Lineplot_number_diffex_genes_per_context.png"),
+        os.path.join(output_dir, "lineplot_number_diffex_genes_per_context.png"),
         bbox_inches="tight",
     )
 
@@ -304,7 +437,8 @@ if __name__ == "__main__":
         list_of_deg_pandas,
     )
 
-    line_plot_counts(merged_deg_no_module_ID, args.output_dir)
+    graph_venn_diagram_deg_per_context(merged_deg_no_module_ID, args.output_dir)
+    graph_line_plot_deg_per_context(merged_deg_no_module_ID, args.output_dir)
 
     merged_deg_w_module_ID = pd.merge(
         merged_deg_no_module_ID,
@@ -354,7 +488,6 @@ if __name__ == "__main__":
     percentages.set_index("Module_Color", inplace=True)
     top_n_modules_and_percent_per_context(percentages, args.output_dir)
 
-    # TODO rename this variable and output filename
     # MAGIC filename
     percentages.to_csv(
         os.path.join(args.output_dir, "DEG_percentages_in_modules.tsv"),
