@@ -114,6 +114,7 @@ module_log2fc_overlap:
 # Filter DEGs by Modules
 module_deg_overlap:
 	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/
+	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/Unique_and_Shared_DEGs
 	python $(ROOT_DIR)/src/module_overlap/module_deg_overlap.py \
 	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
