@@ -151,6 +151,12 @@ if __name__ == "__main__":
         ),
         all_go_list,
     )
+
+    # NOTE
+    # Remove rows where the entire row is NA
+    # Remove columns (modules) where the entire module is NA
+    all_go_merged.dropna(axis=0, how="all", inplace=True)
+    all_go_merged.dropna(axis=1, how="all", inplace=True)
     all_go_merged.fillna("Not_Recovered", inplace=True)
 
     interesting_go_terms = read_interesting_GO_terms(args.interesting_go_terms)
@@ -159,20 +165,10 @@ if __name__ == "__main__":
         all_go_merged["GO_ID"].isin(interesting_go_terms["GO_ID"])
     ]
 
-    # Perform a simple sort
-    # col_to_sort = [
-    # col for col in interesting_go_term_info.columns.to_list() if "GO" not in col
-    # ]
-    # print(interesting_go_term_info.sort_values(by=col_to_sort, ascending=False))
     interesting_go_terms = interesting_go_terms.sort_values(
         by=["GO_ID"], ascending=True
     )
 
-    # print(
-    # interesting_go_term_info.loc[
-    # interesting_go_term_info["turquoise"] == "Recovered"
-    # ]
-    # )
     interesting_go_term_info.to_csv(
         os.path.join(args.output_dir, "Interesting_GO_Term_Module_Representation.tsv"),
         sep="\t",
