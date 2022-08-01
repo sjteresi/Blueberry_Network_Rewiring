@@ -34,6 +34,7 @@ DEV_MODULES_IN_AT := $(DEV_RESULTS)/Modules/modulecolors_AT
 # TopGO related paths
 DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_DATA)/ATH_GO_GOSLIM.txt
 DEV_FILTERED_GO_OUTPUT := $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv
+DEV_FILTERED_GO_OUTPUT_DIR := $(DEV_RESULTS)/GO/
 
 
 .PHONY: dev help
@@ -67,7 +68,7 @@ blueberry_module_conversion_to_arabidopsis:
 # Distill the raw gene universe GO file down into a format for TopGO
 filter_GO:
 	mkdir -p $(DEV_RESULTS)/GO
-	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DOWNLOADED_GO_UNIVERSE) $(DEV_FILTERED_GO_OUTPUT)
+	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DOWNLOADED_GO_UNIVERSE) $(DEV_FILTERED_GO_OUTPUT_DIR)
 
 # Run TopGO to get over/under representation of terms
 # NOTE need to go back and get filter modules code because those individually processed modules are used in TopGO
@@ -118,6 +119,7 @@ module_deg_overlap:
 	python $(ROOT_DIR)/src/module_overlap/module_deg_overlap.py \
 	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
+	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
 	       $(DEV_RESULTS)/module_overlap/module_deg_overlap/
 
 # Filter GO by Modules

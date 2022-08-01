@@ -2,6 +2,10 @@
 
 """
 Filter a GO term database of Arabidopsis genes.
+Generate two dataframes:
+    Arabidopsis genes as rows, GO IDs as weird list format that TopGO wants
+
+    GO IDs as rows, GO terms (string) in second column
 """
 
 __author__ = "Scott Teresi"
@@ -12,6 +16,41 @@ import logging
 import pandas as pd
 import re
 import os
+
+
+def generate_go_id_and_term_table(go_master_file):
+    """
+    TODO
+    """
+    column_names = [
+        "locus_name",
+        "TAIR_accession",
+        "object_name",
+        "relationship_type",
+        "GO_term",
+        "GO_ID",
+        "TAIR_keyword_ID",
+        "aspect",
+        "GOslim_term",
+        "evidence_code",
+        "evidence_description",
+        "evidence_with",
+        "reference",
+        "annotator",
+        "date",
+    ]
+    columns_to_use = ["GO_ID", "GO_term"]
+    data = pd.read_csv(
+        go_master_file,
+        sep="\t",
+        comment="!",
+        header=None,
+        names=column_names,
+        usecols=columns_to_use,
+    )
+    data.drop_duplicates(inplace=True)
+    data.rename(columns={"GO_term": "GO_Term"}, inplace=True)
+    return data
 
 
 def read_master_GO_table(go_master_file):
@@ -90,5 +129,17 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     data = read_master_GO_table(args.go_master_file)
+    data.to_csv(
+        os.path.join(args.go_output_path, "ArabidopsisGene_w_GO.tsv"),
+        sep="\t",
+        index=False,
+        header=False,
+    )
 
-    data.to_csv(args.go_output_path, sep="\t", index=False, header=False)
+    go_id_table = generate_go_id_and_term_table(args.go_master_file)
+    go_id_table.to_csv(
+        os.path.join(args.go_output_path, "GO_ID_w_Term.tsv"),
+        sep="\t",
+        index=False,
+        header=False,
+    )
