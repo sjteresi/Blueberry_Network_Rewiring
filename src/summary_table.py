@@ -15,8 +15,7 @@ import re
 import os
 from functools import reduce
 
-from src.modules.filter_modules import read_synteny_homology_table
-from src.modules.filter_modules import read_gene_modules_table
+from src.read_tables_and_dir import read_synteny_homology_table, read_gene_modules_table
 
 
 def read_TPM_expression_table(input_file):

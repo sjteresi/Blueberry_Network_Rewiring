@@ -15,7 +15,7 @@ import pandas as pd
 import os
 from functools import reduce
 
-from src.modules.filter_modules import read_gene_modules_table
+from src.read_tables_and_dir import read_gene_modules_table
 
 
 def read_log_2fc_dir(input_directory):

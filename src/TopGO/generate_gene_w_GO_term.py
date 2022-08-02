@@ -20,7 +20,8 @@ import os
 
 def generate_go_id_and_term_table(go_master_file):
     """
-    TODO
+    Read the TAIR unfiltered GO table and reformat and save to a more conducive
+    format
     """
     column_names = [
         "locus_name",
@@ -39,7 +40,7 @@ def generate_go_id_and_term_table(go_master_file):
         "annotator",
         "date",
     ]
-    columns_to_use = ["GO_ID", "GO_term"]
+    columns_to_use = ["locus_name", "GO_ID", "GO_term"]
     data = pd.read_csv(
         go_master_file,
         sep="\t",
@@ -49,7 +50,11 @@ def generate_go_id_and_term_table(go_master_file):
         usecols=columns_to_use,
     )
     data.drop_duplicates(inplace=True)
-    data.rename(columns={"GO_term": "GO_Term"}, inplace=True)
+    data.rename(
+        columns={"locus_name": "Arabidopsis_Gene", "GO_term": "GO_Term_Description"},
+        inplace=True,
+    )
+    data.sort_index(axis=1, inplace=True)
     return data
 
 
@@ -129,6 +134,8 @@ if __name__ == "__main__":
     coloredlogs.install(level=log_level)
 
     data = read_master_GO_table(args.go_master_file)
+
+    # NOTE this is for TOPGO
     data.to_csv(
         os.path.join(args.go_output_path, "ArabidopsisGene_w_GO.tsv"),
         sep="\t",
@@ -136,10 +143,11 @@ if __name__ == "__main__":
         header=False,
     )
 
+    # NOTE this is for other analyses
     go_id_table = generate_go_id_and_term_table(args.go_master_file)
     go_id_table.to_csv(
         os.path.join(args.go_output_path, "GO_ID_w_Term.tsv"),
         sep="\t",
         index=False,
-        header=False,
+        header=True,
     )

@@ -14,7 +14,7 @@ import pandas as pd
 import os
 from functools import reduce
 
-from src.modules.filter_modules import read_gene_modules_table
+from src.read_tables_and_dir import read_gene_modules_table
 from src.module_overlap.module_log2fc_overlap import (
     calc_gene_counts_per_module,
 )

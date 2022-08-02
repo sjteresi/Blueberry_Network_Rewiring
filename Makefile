@@ -115,12 +115,21 @@ module_log2fc_overlap:
 # Filter DEGs by Modules
 module_deg_overlap:
 	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/
-	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/Unique_and_Shared_DEGs
 	python $(ROOT_DIR)/src/module_overlap/module_deg_overlap.py \
 	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
 	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
 	       $(DEV_RESULTS)/module_overlap/module_deg_overlap/
+
+# Make figures and tables relating to DEG representation at various time points
+deg_time_points:
+	mkdir -p $(DEV_RESULTS)/DEGs/
+	mkdir -p $(DEV_RESULTS)/DEGs/Unique_and_Shared_DEGs
+	python $(ROOT_DIR)/src/DEG_Analysis/deg_time_points.py \
+	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
+	       $(DEV_RESULTS)/GO/GO_ID_w_Term.tsv \
+	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
+	       $(DEV_RESULTS)/DEGs/
 
 # Filter GO by Modules
 module_go_overlap:
