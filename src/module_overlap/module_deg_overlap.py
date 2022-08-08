@@ -162,6 +162,14 @@ if __name__ == "__main__":
         gene_counts_per_module, on="Module_Color", how="outer"
     )
     modules_and_count_per_context.set_index("Module_Color", inplace=True)
+    modules_and_count_per_context.sort_index(axis=1, inplace=True, ascending=False)
+    # Save the table of the raw counts before we do the division
+    modules_and_count_per_context.to_csv(
+        os.path.join(args.output_dir, "DEG_counts_in_modules.tsv"),
+        sep="\t",
+        header=True,
+        index=True,
+    )
 
     # Divide to get the percentage
     percentages = modules_and_count_per_context.apply(
@@ -182,6 +190,7 @@ if __name__ == "__main__":
     )
 
     percentages.set_index("Module_Color", inplace=True)
+    percentages.sort_index(axis=1, inplace=True, ascending=False)
     top_n_modules_and_percent_per_context(percentages, args.output_dir)
 
     # MAGIC filename

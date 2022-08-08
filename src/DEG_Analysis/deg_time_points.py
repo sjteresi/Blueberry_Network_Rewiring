@@ -34,13 +34,8 @@ def get_unique_and_non_unique_genes_per_comparison(
     all_degs_pandas, draper_col, liberty_col
 ):
     """
-    # TODO add the arabidopsis gene column nmae
-
     Gets the counts of unique and non-unique DEGs per genotype comparison.
-    Basically does Draper C1 and T1 vs Liberty C1 and T1. I am grouping the
-    DEGs of up and down for each genotype to get the overall. Then I use set
-    terminology to determine which genes are shared and unshared for each
-    comparison.
+    Basically does Draper C1 and T1 vs Liberty C1 and T1 and so on.
 
     Args:
         all_degs_pandas (pandas.Data.Frame): Pandas dataframe of
@@ -325,7 +320,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     # NB input args correspond to Makefile, must be ordered correctly
     parser.add_argument("DEG_dir", type=str, help="output from EdgeR")
-    parser.add_argument("GO_ID_Term_file", type=str, help="TODO")
+    parser.add_argument(
+        "GO_ID_Term_file",
+        type=str,
+        help="""filtered GO file
+                        from custom script""",
+    )
     parser.add_argument(
         "orthology_file",
         type=str,

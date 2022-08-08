@@ -80,6 +80,7 @@ topGO:
 #----------------------------------------#
 # Master summary table
 # TODO update for paths f results and data
+# TODO this table may be less useful now since things have changed and easier table formats exist
 summary_table:
 	mkdir -p $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 	python $(ROOT_DIR)/src/summary_table.py \
