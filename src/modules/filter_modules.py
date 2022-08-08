@@ -18,72 +18,7 @@ import coloredlogs
 import os
 import pandas as pd
 
-
-def read_synteny_homology_table(filepath):
-    """
-    Read the synteny/homology table of blueberry and arabidopsis genes that was
-    previously created
-    Args:
-        filepath (str): Path to the table
-
-    Returns:
-        synteny_homology_table (pandas dataframe): columns = [
-        Arabidopsis_Gene, Blueberry_Gene, E_Value, Point_of_Origin]
-    """
-    synteny_homology_table = pd.read_csv(
-        filepath,
-        sep="\t",
-        header="infer",
-    )
-    return synteny_homology_table
-
-
-def read_gene_modules_table(filepath):
-    """
-    Read the table of blueberry genes and module identities that was
-    previously created
-
-    Args:
-        filepath (str): Path to the table
-
-    Returns:
-        gene_modules_table (pandas dataframe): columns=[Blueberry_Gene,
-        Module_Color]
-    """
-    gene_modules_table = pd.read_csv(
-        filepath,
-        sep="\t",
-        header="infer",
-    )
-    gene_modules_table.rename(
-        columns={"Gene_Names": "Blueberry_Gene", "moduleColor": "Module_Color"},
-        inplace=True,
-    )
-
-    return gene_modules_table
-
-
-def merge_wgcna_genes_with_arabidopsis_ortholog(
-    gene_modules_table, synteny_homology_table
-):
-    """
-    Take a table of gene modules (blueberry genes and the module identity) and
-    merge that with the synteny/homology table
-
-    Args:
-        gene_modules_table (): Pandaframe of genes and their module identities
-        synteny_homology_table (): Pandaframe of blueberry and arabidopsis gene
-        pairs with E-Values
-
-    Returns:
-        merged_dataframe (pandas dataframe): dataframe where input args were
-        merged on common blueberry gene column
-    """
-    merged_dataframe = pd.merge(
-        gene_modules_table, synteny_homology_table, on="Blueberry_Gene"
-    )
-    merged_dataframe.drop(columns=["Point_of_Origin"], inplace=True)
-    return merged_dataframe
+from src.read_tables_and_dir import read_synteny_homology_table, read_gene_modules_table
 
 
 def save_color_groups(color, dataframe, output_dir):
@@ -153,9 +88,11 @@ def process(genes_w_module_groups, gene_pairs, output_dir):
         save_missing_color_groups(color, frame, output_location)
 
     # Now get a master table of all non-missing Arabidopsis-Blueberry pairs
-    modules_w_AT = merge_wgcna_genes_with_arabidopsis_ortholog(
-        gene_modules_table, synteny_homology_table
+    modules_w_AT = pd.merge(
+        gene_modules_table, synteny_homology_table, on="Blueberry_Gene"
     )
+    modules_w_AT.drop(columns=["Point_of_Origin"], inplace=True)
+
     # MAGIC column name
     grouped_modules = modules_w_AT.groupby(["Module_Color"])
 

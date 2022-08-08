@@ -80,6 +80,7 @@ topGO:
 #----------------------------------------#
 # Master summary table
 # TODO update for paths f results and data
+# TODO this table may be less useful now since things have changed and easier table formats exist
 summary_table:
 	mkdir -p $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 	python $(ROOT_DIR)/src/summary_table.py \
@@ -115,12 +116,21 @@ module_log2fc_overlap:
 # Filter DEGs by Modules
 module_deg_overlap:
 	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/
-	mkdir -p $(DEV_RESULTS)/module_overlap/module_deg_overlap/Unique_and_Shared_DEGs
 	python $(ROOT_DIR)/src/module_overlap/module_deg_overlap.py \
 	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
 	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
 	       $(DEV_RESULTS)/module_overlap/module_deg_overlap/
+
+# Make figures and tables relating to DEG representation at various time points
+deg_time_points:
+	mkdir -p $(DEV_RESULTS)/DEGs/
+	mkdir -p $(DEV_RESULTS)/DEGs/Unique_and_Shared_DEGs
+	python $(ROOT_DIR)/src/DEG_Analysis/deg_time_points.py \
+	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
+	       $(DEV_RESULTS)/GO/GO_ID_w_Term.tsv \
+	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
+	       $(DEV_RESULTS)/DEGs/
 
 # Filter GO by Modules
 module_go_overlap:
