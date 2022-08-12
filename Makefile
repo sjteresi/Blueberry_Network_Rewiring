@@ -77,6 +77,11 @@ topGO:
 	mkdir -p $(DEV_RESULTS)/GO/topGO
 	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/topGO $(DEV_DOCUMENTATION)
 
+filter_proteins:
+	mkdir -p $(DEV_RESULTS)/proteins
+	#python $(ROOT_DIR)/src/proteins/protein_table.py $(DEV_DATA)/Araport_pep_20220103 $(DEV_RESULTS)/proteins
+	python $(ROOT_DIR)/src/proteins/protein_table.py $(DEV_DATA)/TAIR10_pep_20101214.txt $(DEV_RESULTS)/proteins
+
 #----------------------------------------#
 # Master summary table
 # TODO update for paths f results and data
