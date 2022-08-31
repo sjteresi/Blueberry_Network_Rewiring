@@ -155,5 +155,10 @@ sync_local_to_remote_data:
 sync_local_to_remote_results:
 	rsync -ave ssh /home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/results --chmod=Dg+s teresisc@rsync.hpcc.msu.edu:/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/
 
+sync_hpcc_to_onedrive:
+	# MUST be standing in root folder for project
+	ml Rclone
+	rclone sync . remote:HPCC_Mirror/Blueberry_Network_Rewiring/ -P
+
 create_module_table:
 	$(ROOT_DIR)/src/modules/make_module_deg_table.py $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv $(DEV_DIFFEXDIR)/ "All_Hap" "FDR" $(DEV_RESULTS)/Modules
