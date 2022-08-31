@@ -15,18 +15,14 @@ import re
 import os
 from functools import reduce
 
-from src.read_tables_and_dir import read_synteny_homology_table, read_gene_modules_table
+from src.read_tables_and_dir import (
+    read_synteny_homology_table,
+    read_gene_modules_table,
+    read_FPKM_or_TPM,
+)
 
 
-def read_TPM_expression_table(input_file):
-    """
-    Read a TPM expression table from file using Pandas
-    """
-    data = pd.read_csv(input_file, sep="\t", header="infer")
-    data.rename(columns={"Gene_Name": "Blueberry_Gene"}, inplace=True)
-    return data
-
-
+# TODO refactor this to read tables and dir
 def read_diff_ex_direction_directory(input_directory):
     """
     Parse over a directory and get the files that do not have the suffix

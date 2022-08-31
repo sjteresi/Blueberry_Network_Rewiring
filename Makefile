@@ -93,7 +93,7 @@ summary_table:
 	       $(DEV_DATA)/AtBB/data_output/Synteny_Homology_Table.tsv \
 	       $(DEV_DATA)/Diff_Ex/EdgeR_Output/All_Hap/FDR/ \
 	       $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv \
-	       $(DEV_DATA)/TPM/Blueberry_TPM_All.tsv \
+	       $(DEV_RESULTS)/FPKM_TPM/Blueberry_TPM_All_Haplotype.tsv \
 	       $(DEV_RESULTS)/Complete_Gene_Summary_Table.tsv \
 	       $(DEV_RESULTS)/Summary_Diff_Ex_Modules
 
@@ -144,6 +144,9 @@ module_go_overlap:
 	       $(DEV_RESULTS)/GO/topGO/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
 	       $(DEV_RESULTS)/GO/Interesting_GO_categories_melanie_converted_7_15_2022.tsv \
+	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
+	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
+	       $(DEV_RESULTS)/GO/GO_ID_w_Term.tsv \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/
 
 sync_local_to_remote_data:

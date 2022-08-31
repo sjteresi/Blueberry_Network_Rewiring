@@ -13,6 +13,27 @@ import pandas as pd
 import os
 
 
+def read_GO_dir(input_directory):
+    """
+    Reads an input directory and returns a list of file paths that contain
+    the magic substring 'Summary'
+
+    Args:
+        input_directory (str): Path to directory that contains files with our
+        magic substring. This directory is parsed to find filenames that match
+        the substring.
+
+    Returns:
+        go_files (list): List of absolute file paths
+    """
+    go_files = [
+        os.path.join(input_directory, f)
+        for f in os.listdir(input_directory)
+        if (os.path.isfile(os.path.join(input_directory, f))) and ("Summary" in f)
+    ]  # MAGIC substring for filename recognition
+    return go_files
+
+
 def read_gene_modules_table(filepath):
     """
     Read the table of blueberry genes and module identities that was
@@ -185,3 +206,18 @@ def read_synteny_homology_table(filepath):
         header="infer",
     )
     return synteny_homology_table
+
+
+def read_interesting_GO_terms(filepath):
+    """
+    TODO
+    """
+    colnames = ["GO_ID", "GO_Term"]
+    interesting_go_terms = pd.read_csv(filepath, names=colnames, header=None, sep="\t")
+    return interesting_go_terms
+
+
+def read_FPKM_or_TPM(filepath):
+    data = pd.read_csv(filepath, header="infer", sep="\t")
+    data.rename(columns={"Gene_Name": "Blueberry_Gene"}, inplace=True)
+    return data
