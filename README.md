@@ -21,7 +21,7 @@ The code is broken up into several different scripts inside the `src/` directory
 
 ## Arabidopsis Blueberry Orthology:
 - `filter_orthologs.py`: Master code file for executing and filtering gene orthology data. Creates an ortholog table by merging a set of syntelogs (SynMap) and a set of homologs (BLAST).
-	- Inputs: raw syntelog data from SynMap, see [SynMap Methods](#identifying-syntelogs), raw homolog data from BLAST, see [BLAST Methods](#identifying-homologs).
+	- Inputs: raw syntelog data from SynMap, see SynMap Methods, raw homolog data from BLAST, see BLAST Methods.
 	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
 - `import_homologs.py`: Imports the homolog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
 - `import_syntelogs.py`: Imports syntelog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
@@ -32,12 +32,12 @@ The code is broken up into several different scripts inside the `src/` directory
 - `process_fpkm.py`: Generates an expression table in FPKM from a count matrix of blueberry genes.
 	- Inputs: Genes input file, count matrix, output directory path
 	- Outputs: Saves a table of FPKM values to the output directory.
-- `fpkm.py`: Helper file, calculates the FPKM (fragments per kilobase trascript per million reads).
+- `fpkm.py`: Helper file of `process_fpkm`, calculates the FPKM (fragments per kilobase trascript per million reads).
 - `process_tpm.py`: Generates an expression table in TPM from a count matrix of blueberry genes.
 	- Inputs: Gene input files, count matrix, output directory path (same arguments as `process_fpkm.py`)
 	- Outputs: Saves a table of TPM values to the output directory.
-- `tpm.py`: Helper file, calculates the TPM matrix.
-- `gene_lengths.py`: Reads a gene file and sums the length of the gene. Helper file of `process_fpkm.py` and `process_tpm.py`. Sums by exon length.
+- `tpm.py`: Helper file of `process_tpm`, calculates the TPM matrix.
+- `gene_lengths.py`: Reads gene annotation file and sums the exon lengths to find the length of the gene. Helper file of both `process_fpkm.py` and `process_tpm.py`.
 - `count_matrix.py`: Reads in and cleans the count data. Helper file of `process_fpkm.py` and `process_tpm.py`.
 
 ## WGCNA:
