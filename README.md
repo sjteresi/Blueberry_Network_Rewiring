@@ -49,7 +49,7 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
 	- Outputs: Creates a csv in the output directory of the unified dataframe.
 
-##module\_overlap:
+## module\_overlap:
 - TODO
 
 ## Modules TODO:
