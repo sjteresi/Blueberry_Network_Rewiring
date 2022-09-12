@@ -23,9 +23,9 @@ The code is broken up into several different scripts inside the `src/` directory
 - `filter_orthologs.py`: Master code file for executing and filtering gene orthology data. Creates an ortholog table by merging a set of syntelogs (SynMap) and a set of homologs (BLAST).
 	- Inputs: raw syntelog data from SynMap (see SynMap Methods), raw homolog data from BLAST (see BLAST Methods.)
 	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
-- `import_homologs.py`: Imports the homolog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
-- `import_syntelogs.py`: Imports syntelog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
-- `merge_homo_synt`: Merges the sets of homologs and syntelogs. Helper file of `filter_orthologs.py`. Prioritizes results from synteny over results from simple homology.
+- `import_homologs.py`: Helper file of `filter_orthologs.py`. Imports the homolog data from the raw file and manages data filtration.
+- `import_syntelogs.py`: Helper file of `filter_orthologs.py`.Imports syntelog data from the raw file and manages data filtration.
+- `merge_homo_synt.py`: Helper file of `filter_orthologs.py`. Merges the sets of homologs and syntelogs. Prioritizes results from synteny over results from simple homology.
 - `blastall.sb`: BASH file that runs the BLAST search on the computing cluster.
 
 ## FPKM and TPM Evaluation:
@@ -53,10 +53,16 @@ The code is broken up into several different scripts inside the `src/` directory
 - `filter_modules.py`: Find union of differential expression / orthology set with the WGCNA output of 10 genes assigned to modules.
 	- Inputs: WGCNA output file, Syntenny/homology output file, output folder
 	- Outputs: `TODO`
+- `log2fc_hist.py`: Creates a histogram of the % expression of modules in each comparison.
+	- Inputs: Path to the log2fc data file, output path
+	- Ouptuts: A 5x6 histogram.
+
+## Proteins:
+- `protein_table.py`: Filters the master Arabidopsis TAIR protein table.
 
 ##  TopGO:
 - `generate_gene_w_GO_term.py`: Filters a GO term data table of Arabidopsis genes
-	- Inputs: GO master file, downloaded from TAIR, output directory path
+	- Inputs: GO master file downloaded from TAIR, output directory path
 	- Outputs: `ArabidopsisGene_w_GO.tsv`, each Arabidopsis gene and its corresponding GO terms, filtered down so it can be used as an input in TopGO
 - `topGO_blueberry.R`: Runs TopGO
 	- Inputs: Folder of modules in Arabidposis gene format, filtered GO output from `generate_gene_w_GO_term.py`, output directory, documentation directory
@@ -77,7 +83,10 @@ The code is broken up into several different scripts inside the `src/` directory
 - `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
 	- Inputs: Parent path of fpkm table, parent path of syntelog table, output directory
 	- Outputs: Saves FPKM table as a tsv.
-
+- `read_tables_and_dir.py`: Helper file of `modules/filter_modules.py`. Reads files and directories, performing minimal re-formatting where needed.
+- `summary_table.py`: Create the union of dataframes of differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO term, and blueberry gene network module identity.
+	- Inputs: file of blueberry genes and the corresponding module IDs, file of blueberry genes and their corresponding Arabidopsis orthologs, directory containing the differential expression files, file of arabidopsis genes and their corresponding GO terms, file of blueberry genes and its TPM level on a library by library basis, name for the output, path to the output directory.
+	- Outputs: Summary table.
 ## Python Requirements:
 We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`.
 
