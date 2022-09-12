@@ -38,7 +38,7 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Outputs: Saves a table of TPM values to the output directory.
 - `tpm.py`: Helper file of `process_tpm`, calculates the TPM matrix.
 - `gene_lengths.py`: Reads gene annotation file and sums the exon lengths to find the length of the gene. Helper file of both `process_fpkm.py` and `process_tpm.py`.
-- `count_matrix.py`: Reads in and cleans the count data. Helper file of `process_fpkm.py` and `process_tpm.py`.
+- `count_matrix.py`: Helper file of `process_fpkm.py` and `process_tpm.py`. Reads in and cleans the count data.
 
 ## WGCNA:
 - `run_wgcna.sb`: Used to run `Blueberry_WGCNA.R` on the computing cluster.
@@ -73,13 +73,14 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: Folder of tables of columns (blueberry genes, arabidopsis ortholog, E value, Point of Origin, RNA-Seq library context with float value for fold change)
 	- Outputs: 1 file, a table of Module ID and columns of the percent AND number of genes in a given expression context, up or down regulation.
 
-##  gene\_stats TODO:
-- `operations.py`: Calculates the percentages of each gene belonging to each identification type. Note: this is not used anywhere, and whenever a gene is found by both, Syntenny was chosen.
+##  gene\_stats:
+- `operations.py`: Calculates the percentages of each gene belonging to each identification type. Whenever a gene was found by both, Syntenny was chosen.
 - `summary_table.py`: Unifies the following dataframes - differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO terms, and Blueberry gene network module identity.
 	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
 	- Outputs: Creates a csv in the output directory of the unified dataframe.
 
 ## Miscellaneous:
+These files are found in the main `src/` folder.
 - `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
 	- Inputs: Parent path of fpkm table, parent path of syntelog table, output directory
 	- Outputs: Saves FPKM table as a tsv.
