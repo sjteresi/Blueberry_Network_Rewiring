@@ -6,7 +6,7 @@ Breed new blueberry cultivars that are resistant to the blueberry stem gall wasp
 # Contact Information:
 | Role          | Name          | GitHub                                                  | Email              |
 |---------------|---------------|---------------------------------------------------------|--------------------|
-| Project Lead: | Scott Teresi  | [Personal GitHub](https://github.com/huckleberry-hound) | <teresisc@msu.edu> |
+| Project Lead: | Scott Teresi  | [Personal GitHub](https://github.com/sjteresi) | <teresisc@msu.edu> |
 | Undergraduate: | Alder Fulton  | [Personal GitHub](https://github.com/Alder-pixel) | <fultona5@msu.edu> |
 | PI:           | Patrick Edger | [Lab GitHub](https://github.com/EdgerLab)               | <edgerpat@msu.edu> |
 
