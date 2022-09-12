@@ -11,7 +11,7 @@ __author__ = "Scott Teresi"
 import pandas as pd
 
 
-def merge_homo_synt(syntelogs, homologs):
+def merge_homologs_syntelogs(syntelogs, homologs):
     """
     Only add a blueberry gene from the BLAST set (wrapped homologs) if that
     gene is not currently in the synteny set. This is because we give priorty

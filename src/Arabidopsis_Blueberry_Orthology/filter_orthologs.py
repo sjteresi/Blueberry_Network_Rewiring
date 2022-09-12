@@ -16,7 +16,7 @@ import coloredlogs
 
 from import_syntelogs import import_syntelogs
 from import_homologs import import_homologs
-from merge_homo_synt import merge_homo_synt
+from merge_homologs_syntelogs import merge_homologs_syntelogs
 
 
 def process(
@@ -51,7 +51,7 @@ def process(
 
     # Merge the synteny and homology data
     logger.info("Merging the data...")
-    merged_all = merge_homo_synt(syntelogs, homologs)
+    merged_all = merge_homologs_syntelogs(syntelogs, homologs)
     # Save synteny/homology data to disk
     # MAGIC filename
     file_to_save = os.path.join(data_output_path, "Synteny_Homology_Table.tsv")

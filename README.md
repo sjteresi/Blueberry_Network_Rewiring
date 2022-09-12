@@ -25,7 +25,7 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
 - `import_homologs.py`: Helper file of `filter_orthologs.py`. Imports the homolog data from the raw file and manages data filtration.
 - `import_syntelogs.py`: Helper file of `filter_orthologs.py`.Imports syntelog data from the raw file and manages data filtration.
-- `merge_homo_synt.py`: Helper file of `filter_orthologs.py`. Merges the sets of homologs and syntelogs. Prioritizes results from synteny over results from simple homology.
+- `merge_homologs_syntelogs.py`: Helper file of `filter_orthologs.py`. Merges the sets of homologs and syntelogs. Prioritizes results from synteny over results from simple homology.
 - `blastall.sb`: BASH file that runs the BLAST search on the computing cluster.
 
 ## FPKM and TPM Evaluation:
