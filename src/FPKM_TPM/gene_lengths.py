@@ -66,11 +66,3 @@ def import_genes(genes_input_path):
 
     return exon_sums
 
-
-if __name__ == "__main__":
-
-    x = import_genes(
-        "/home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/data/V_corymbosum_v1.0_geneModels.gff"
-    )
-
-    x.to_csv("gene_lengths.tsv", header=True, sep="\t")
