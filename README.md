@@ -21,7 +21,7 @@ The code is broken up into several different scripts inside the `src/` directory
 
 ## Arabidopsis Blueberry Orthology:
 - `filter_orthologs.py`: Master code file for executing and filtering gene orthology data. Creates an ortholog table by merging a set of syntelogs (SynMap) and a set of homologs (BLAST).
-	- Inputs: raw syntelog data from SynMap, see SynMap Methods, raw homolog data from BLAST, see BLAST Methods.
+	- Inputs: raw syntelog data from SynMap (see SynMap Methods), raw homolog data from BLAST (see BLAST Methods.)
 	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
 - `import_homologs.py`: Imports the homolog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
 - `import_syntelogs.py`: Imports syntelog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.

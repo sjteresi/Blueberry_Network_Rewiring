@@ -12,18 +12,19 @@ import pandas as pd
 import numpy as np
 
 
-def process(genome_file, orthology_file, efilter):
-    """"
+def process(gene_annotation_file, orthology_file, efilter):
+    """ "
     Args:
-       genome_file (str): path to the csv containing the data for different genes.
-       orthology_file: path to the orthology file containg the different identification types.
+       gene_annotation_file (str): path to the csv containing the data for
+       different blueberry genes.
+       orthology_file (str): path to the orthology file containg the different identification types.
 
     Returns:
         None. Prints the proportions of each gene.
 
     """
 
-    # Import genome_file
+    # Import gene_annotation_file
     col_names = [
         "Chromosome",
         "Software",
@@ -42,7 +43,7 @@ def process(genome_file, orthology_file, efilter):
     ]
 
     genes_df = pd.read_csv(
-        genome_file,
+        gene_annotation_file,
         delimiter="\t",
         header=None,
         engine="python",
@@ -52,19 +53,22 @@ def process(genome_file, orthology_file, efilter):
     )
     genes_df = genes_df[genes_df["Feature"] == "gene"]
     genes_df["Fullname"] = genes_df["Fullname"].str.split("Name=").str.get(1)
-    N = genes_df["Fullname"].size
+    N = len(genes_df["Fullname"])
 
     # Import orthology_file
     orthology_df = pd.read_csv(
-        orthology_file, delimiter="\t", header="infer", engine="python",
+        orthology_file,
+        delimiter="\t",
+        header="infer",
+        engine="python",
     )
     orthology_df.drop(columns=["Arabidopsis_Gene"], inplace=True)
     # Column name is E_Value
     orthology_df = orthology_df[orthology_df["E_Value"] <= efilter]
-    S = orthology_df["Point_of_Origin"][
-        orthology_df["Point_of_Origin"] == "Synteny"
-    ].size
-    B = orthology_df["Point_of_Origin"][orthology_df["Point_of_Origin"] == "BLAST"].size
+    synteny_mask = orthology_df["Point_of_Origin"] == "Synteny"
+    S = sum(synteny_mask)
+    blast_mask = orthology_df["Point_of_Origin"] == "BLAST"
+    B = sum(blast_mask)
     Q = N - (B + S)
     proportions = calc_percents(N, (S, B, Q))
 
@@ -101,10 +105,14 @@ if __name__ == "__main__":
     )  # The path that leads you to this file, not including this file.
 
     parser.add_argument(
-        "genome_file", type=str, help="parent path to the genome file",
+        "gene_annotation_file",
+        type=str,
+        help="parent path to the gene annotation file",
     )
     parser.add_argument(
-        "orthology_file", type=str, help="parent path to the synteny/BLAST file",
+        "orthology_file",
+        type=str,
+        help="parent path to the synteny/BLAST file",
     )
     parser.add_argument(
         "--e_filter",
@@ -113,7 +121,7 @@ if __name__ == "__main__":
         default=1e-5,
     )
     args = parser.parse_args()
-    args.genome_file = os.path.abspath(args.genome_file)
+    args.gene_annotation_file = os.path.abspath(args.gene_annotation_file)
     args.orthology_file = os.path.abspath(args.orthology_file)
 
-    process(args.genome_file, args.orthology_file, args.e_filter)
+    process(args.gene_annotation_file, args.orthology_file, args.e_filter)

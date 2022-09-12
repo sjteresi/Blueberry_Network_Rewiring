@@ -101,7 +101,7 @@ summary_table:
 #----------------------------------------#
 # Gene Stats
 gene_stats_all:    # execute gene stats
-	$(ROOT_DIR)/src/gene_stats/operations.py $(DEV_GENOME) $(DEV_ORTHOLOGY)
+	$(ROOT_DIR)/src/gene_stats/operations.py $(DEV_GENE_ANNOTATION) $(DEV_SYNTENY_HOMOLOGY_TABLE)
 
 #----------------------------------------#
 
