@@ -17,14 +17,14 @@ Breed new blueberry cultivars that are resistant to the blueberry stem gall wasp
 | Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
 
 # Code:
-The code is broken up into several different scripts inside the `src/` directory. The files are as follows:
+The code is broken up into several different folders inside the `src/` directory. The files are as follows:
 
 ## Arabidopsis Blueberry Orthology:
 - `filter_orthologs.py`: Master code file for executing and filtering gene orthology data. Creates an ortholog table by merging a set of syntelogs (SynMap) and a set of homologs (BLAST).
 	- Inputs: raw syntelog data from SynMap (see SynMap Methods), raw homolog data from BLAST (see BLAST Methods.)
-	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
+	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match. Arabidopsis genes can be repeated in this table.
 - `import_homologs.py`: Helper file of `filter_orthologs.py`. Imports the homolog data from the raw file and manages data filtration.
-- `import_syntelogs.py`: Helper file of `filter_orthologs.py`.Imports syntelog data from the raw file and manages data filtration.
+- `import_syntelogs.py`: Helper file of `filter_orthologs.py`. Imports syntelog data from the raw file and manages data filtration.
 - `merge_homologs_syntelogs.py`: Helper file of `filter_orthologs.py`. Merges the sets of homologs and syntelogs. Prioritizes results from synteny over results from simple homology.
 - `blastall.sb`: BASH file that runs the BLAST search on the computing cluster.
 
@@ -40,17 +40,16 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: Gene input files, count matrix, output directory path (same arguments as `process_fpkm.py`)
 	- Outputs: Saves a table of TPM values to the output directory.
 - `tpm.py`: Helper file of `process_tpm`, calculates the TPM matrix.
-- `gene_lengths.py`: Reads gene annotation file and sums the exon lengths to find the length of the gene. Helper file of both `process_fpkm.py` and `process_tpm.py`.
+- `gene_lengths.py`: Helper file of both `process_fpkm.py` and `process_tpm.py`. Reads gene annotation file and sums the exon lengths to find the length of the gene.
 - `count_matrix.py`: Helper file of `process_fpkm.py` and `process_tpm.py`. Reads in and cleans the count data.
 
 ##  gene\_stats:
 - `operations.py`: Calculates the percentages of each gene belonging to each identification type. Whenever a gene was found by both, Syntenny was chosen.
-- `summary_table.py`: Unifies the following dataframes - differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO terms, and Blueberry gene network module identity.
-	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
-	- Outputs: Creates a csv in the output directory of the unified dataframe.
 
 ## module\_overlap:
-- TODO
+- `module_deg_overlap.py`: Filters DEG representation data and determines overlap with modules from WGCNA.
+- `module_go_overlap.py`: Filters GO data and determines overlap with modules from WGCNA.
+- `module_log2fc_overlap.py`: Filters Log2FC gene representation data and determines overlap with modules from WGCNA. 
 
 ## Modules TODO:
 - `filter_modules.py`: Find union of differential expression / orthology set with the WGCNA output of 10 genes assigned to modules.
@@ -87,9 +86,9 @@ These files are found in the main `src/` folder.
 	- Inputs: Parent path of fpkm table, parent path of syntelog table, output directory
 	- Outputs: Saves FPKM table as a tsv.
 - `read_tables_and_dir.py`: Helper file of `modules/filter_modules.py`. Reads files and directories, performing minimal re-formatting where needed.
-- `summary_table.py`: Create the union of dataframes of differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO term, and blueberry gene network module identity.
-	- Inputs: file of blueberry genes and the corresponding module IDs, file of blueberry genes and their corresponding Arabidopsis orthologs, directory containing the differential expression files, file of arabidopsis genes and their corresponding GO terms, file of blueberry genes and its TPM level on a library by library basis, name for the output, path to the output directory.
-	- Outputs: Summary table.
+- `summary_table.py`: Unifies the following dataframes - differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO terms, and Blueberry gene network module identity.
+	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
+	- Outputs: Creates a csv in the output directory of the unified dataframe.
 ## Python Requirements:
 We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`.
 
