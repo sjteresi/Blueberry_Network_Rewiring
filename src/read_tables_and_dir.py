@@ -33,7 +33,8 @@ def read_GO_dir(input_directory):
     ]  # MAGIC substring for filename recognition
     return go_files
 
-def read_protein_table(filepath)
+
+def read_protein_table(filepath):
     """
     Read the table of Arabidopsis genes and protein ID/names that was
     previously created.
@@ -45,7 +46,7 @@ def read_protein_table(filepath)
         protein_table (pandas dataframe): columns=[Arabidopsis_Gene,
         Protein_ID, Protein_Name]
     """
-    protein_table = pd.read_csv(filepath, sep='\t', header='infer')
+    protein_table = pd.read_csv(filepath, sep="\t", header="infer")
     return protein_table
 
 
