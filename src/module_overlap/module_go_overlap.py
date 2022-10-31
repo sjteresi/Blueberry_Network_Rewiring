@@ -16,7 +16,9 @@ from functools import reduce
 
 from src.read_tables_and_dir import (
     read_gene_modules_table,
+    read_protein_table,
     read_interesting_GO_terms,
+    read_interesting_modules,
     read_FPKM_or_TPM,
     read_synteny_homology_table,
     read_GO_ID_w_term,
@@ -130,7 +132,7 @@ def gen_melanie_table(interesting_go_terms):
 
     # The list comprehension creates a whitelist for us to easily perform
     # calculations on the relevant columns
-    # NOTE errors will happen in future work if column names are not added to
+    # NOTE errors will happen in future work if non-module column names are not added to
     # the below list comprehension.
     module_names = [
         module_name
@@ -146,8 +148,8 @@ def gen_melanie_table(interesting_go_terms):
         mini_df = mini_df.loc[:, ["GO_Term_Type", "GO_TERM", "GO_ID", module_name]]
         col = mini_df.pop(module_name)
         mini_df.insert(0, col.name, col)  # MAGIC, put in first column
-        mini_df.rename(columns={module_name: "Module_ID"}, inplace=True)
-        mini_df["Module_ID"] = col.name
+        mini_df.rename(columns={module_name: "Module_Color"}, inplace=True)
+        mini_df["Module_Color"] = col.name
         to_concat.append(mini_df)
 
     data_table = pd.concat(to_concat)
@@ -169,6 +171,11 @@ if __name__ == "__main__":
         help="file representing the interesting GO terms received from Melanie",
     )
     parser.add_argument(
+        "interesting_modules",
+        type=str,
+        help="file representing the interesting modules IDs received from Melanie",
+    )
+    parser.add_argument(
         "log2fc_expression_data",
         type=str,
         help="file representing the gene expression data",
@@ -182,7 +189,23 @@ if __name__ == "__main__":
         "GO_ID_Term_file",
         type=str,
         help="""filtered GO file
-                        from custom script""",
+                from custom script
+                contains the go term description and AT
+                gene name""",
+    )
+    parser.add_argument(
+        "protein_table",
+        type=str,
+        help="""filtered Arabidopsis
+                        protein table""",
+    )
+
+    parser.add_argument(
+        "master_gene_module_table",
+        type=str,
+        help="""parent path of wgcna output file containing
+                        genes and module groupings
+                        """,
     )
     parser.add_argument("output_dir", type=str, help="output_dir path")
 
@@ -191,9 +214,12 @@ if __name__ == "__main__":
     args.go_dir = os.path.abspath(args.go_dir)
     args.genes_and_module_colors = os.path.abspath(args.genes_and_module_colors)
     args.interesting_go_terms = os.path.abspath(args.interesting_go_terms)
+    args.interesting_modules = os.path.abspath(args.interesting_modules)
     args.log2fc_expression_data = os.path.abspath(args.log2fc_expression_data)
     args.orthologs = os.path.abspath(args.orthologs)
     args.GO_ID_Term_file = os.path.abspath(args.GO_ID_Term_file)
+    args.protein_table = os.path.abspath(args.protein_table)
+    args.master_gene_module_table = os.path.abspath(args.master_gene_module_table)
     args.output_dir = os.path.abspath(args.output_dir)
 
     # NB set logging
@@ -213,64 +239,112 @@ if __name__ == "__main__":
     all_go_merged.dropna(axis=1, how="all", inplace=True)
     all_go_merged.fillna("Not_Recovered", inplace=True)
     # NB save for future even though it may not be all that usful
-    all_go_merged.to_csv(
-        os.path.join(args.output_dir, "TopGO_All_Merged_NoFilter.tsv"),
-        sep="\t",
-        header=True,
-    )
+    # all_go_merged.to_csv(
+    # os.path.join(args.output_dir, "TopGO_All_Merged_NoFilter.tsv"),
+    # sep="\t",
+    # header=True,
+    # )
 
-    # Melanie built a dataset of terms she already had an eye on.
+    # Melanie built a dataset of terms and modules she already had an eye on.
     # We will use this to subset
     interesting_go_terms = read_interesting_GO_terms(args.interesting_go_terms)
-    all_go_merge_interesting_subset = all_go_merged[
+    interesting_modules_pandas = read_interesting_modules(args.interesting_modules)
+    # MAGIC column name
+    interesting_modules_list = interesting_modules_pandas["Modules"].to_list()
+    interesting_go_all_modules = all_go_merged[
         all_go_merged["GO_ID"].isin(interesting_go_terms["GO_ID"])
     ]
-    # NB save for future, this is the all_go_merged data subset by the
-    # interesting genes
-    all_go_merge_interesting_subset.to_csv(
-        os.path.join(args.output_dir, "Interesting_GO_Term_Module_Representation.tsv"),
-        sep="\t",
-        header=True,
-        index=False,
-    )
+    # NB subset the dataset by the set of modules
+    recovery_status_df = interesting_go_all_modules.loc[
+        :, ["GO_ID", "GO_TERM", "GO_Term_Type"] + interesting_modules_list
+    ]
 
+    # Reshape to have Module IDs as rows. Now working towards the 'master' data
+    # table
+    data = gen_melanie_table(recovery_status_df)
+
+    # ------------------------------------------
     # NOTE
-    # Read additional datasets
-    # Expression
-    list_log_2fc_files = read_log_2fc_dir(args.log2fc_expression_data)
-    pandas_log_2fc_files = read_all_log_2fc_files(list_log_2fc_files)
+    # Read and add the arabidopsis genes and GO to the master table
+    # This will make the table even more repetitive because multiple
+    # Arabidopsis genes can point to the same GO
+    GO_ID_Term_table = read_GO_ID_w_term(args.GO_ID_Term_file)
+    GO_ID_Term_table.drop(columns=["GO_Term_Description"], inplace=True)
 
-    # NOTE begin the analysis
+    # Merge with master
+    data = data.merge(GO_ID_Term_table, how="inner", on="GO_ID")
+
+    # ------------------------------------------
+    # NOTE
+    # Read and add the expression (log2FC) data to the master table
+    # Read and add the ortholog data, this adds in the blueberry genes
+    # BUT this will result in rows where a module ID/color does not correspond
+    # to a given blueberry gene. This is remedied further on with an inner
+    # join.
+
+    # Expression data to be added
+    list_log_2fc_files = read_log_2fc_dir(args.log2fc_expression_data)
+    pandas_log_2fc = read_all_log_2fc_files(list_log_2fc_files)
+
     # NB do a pandas merge over a list, merge all the log2fc files (which have
     # different columns), but a common blueberry gene column
     expression_data = reduce(
         lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
-        pandas_log_2fc_files,
+        pandas_log_2fc,
     )
     expression_data.fillna("NA", inplace=True)
 
+    # Ortholog data to be added
     ortholog_data = read_synteny_homology_table(args.orthologs)
-    GO_ID_Term_table = read_GO_ID_w_term(args.GO_ID_Term_file)
-    GO_ID_Term_table.drop(columns=["GO_Term_Description"], inplace=True)
-    # Now begin to add additional information to the table
+
+    # First add the ortholog data to the expression table
+    # This will lead to some NAN in the blueberry genes for the gene expression
+    # columns because these are blueberry genes with an arabidopsis match in
+    # which the blueberry gene was never seen in the expression data.
+    # This makes it so my data frame has basically ALL blueberry genes from my
+    # synteny/homology set.
     orthos_and_expression = pd.merge(
         expression_data, ortholog_data, how="outer", on="Blueberry_Gene"
     )
 
-    data = gen_melanie_table(all_go_merge_interesting_subset)
+    # Fill rows where NaN (blueberry gene with no expression) with the str NA
+    orthos_and_expression.fillna("NA", inplace=True)
 
-    # Add the arabidopsis genes to the table
-    data = data.merge(GO_ID_Term_table, how="inner", on="GO_ID")
-
-    # Add the blueberry genes and gene expression columns to the table
+    # Add the blueberry genes and gene expression columns to the master table
     data = data.merge(orthos_and_expression, how="inner", on="Arabidopsis_Gene")
+
+    # Drop extraneous columns
     data.drop(columns=["E_Value", "Point_of_Origin", "GO_Term_Type"], inplace=True)
+
+    # ------------------------------------------
+    # NOTE
+    # Read and add the protein table
+    proteins = read_protein_table(args.protein_table)
+    # Note this will duplicate some rows because some of the information in the
+    # protein table is duplicated (duplicate genes) with SLIGHTlY different
+    # protein descriptions. I feel that may be best to leave it in the final
+    # product, but will discuss with Melanie
+    data = data.merge(proteins, how="inner", on=["Arabidopsis_Gene"])
+
+    # ------------------------------------------
+    # NOTE but because we are merging back in the blueberry genes we are
+    # going to get the blueberry gene in MULTIPLE modules, which isn't real.
+    # This was referenced in an earlier note, we remove via an inner join.
+    # Basically use the whitelist df as a whitelist to perform a 2 col inner join on.
+
+    whitelist = read_gene_modules_table(args.master_gene_module_table)
+    data = whitelist.merge(data, on=["Blueberry_Gene", "Module_Color"], how="inner")
+    data.sort_values(by=["Blueberry_Gene"], inplace=True)
+
+    # print(data[data.duplicated(subset=["Blueberry_Gene"], keep=False)])
+
+    # data[data.duplicated(subset=["Blueberry_Gene"], keep=False)].to_csv(
+    # "test.tsv", sep="\t", header=True, index=False
+    # )
 
     # Save the data table
     data.to_csv(
-        os.path.join(
-            args.output_dir, "Interesting_GO_Terms_Module_Representation_COMPLETE.tsv"
-        ),
+        os.path.join(args.output_dir, "Interesting_GO_Terms_Module_Representation.tsv"),
         sep="\t",
         header=True,
         index=False,

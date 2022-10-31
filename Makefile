@@ -79,7 +79,6 @@ topGO:
 
 filter_proteins:
 	mkdir -p $(DEV_RESULTS)/proteins
-	#python $(ROOT_DIR)/src/proteins/protein_table.py $(DEV_DATA)/Araport_pep_20220103 $(DEV_RESULTS)/proteins
 	python $(ROOT_DIR)/src/proteins/protein_table.py $(DEV_DATA)/TAIR10_pep_20101214.txt $(DEV_RESULTS)/proteins
 
 #----------------------------------------#
@@ -143,10 +142,13 @@ module_go_overlap:
 	python $(ROOT_DIR)/src/module_overlap/module_go_overlap.py \
 	       $(DEV_RESULTS)/GO/topGO/ \
 	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
-	       $(DEV_RESULTS)/GO/Interesting_GO_categories_melanie_converted_7_15_2022.tsv \
+	       $(DEV_RESULTS)/module_overlap/module_go_overlap/List_Top_10_GO.tsv \
+	       $(DEV_RESULTS)/module_overlap/module_go_overlap/List_Top_11_Modules.tsv \
 	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
 	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
 	       $(DEV_RESULTS)/GO/GO_ID_w_Term.tsv \
+	       $(DEV_RESULTS)/proteins/Filtered_Arabidopsis_Protein_Info.tsv \
+	       $(DEV_WGCNA_GENES_AND_MODULES) \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/
 
 sync_local_to_remote_data:
