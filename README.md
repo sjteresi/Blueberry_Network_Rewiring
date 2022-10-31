@@ -73,9 +73,18 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
 	- Outputs: Creates a csv in the output directory of the unified dataframe.
 
+## Proteins:
+- `protein_table.py`: Filters the master TAIR Arabidopsis protein table to a
+  more manageable format. Generates a table of Arabidopsis genes, their protein
+  ID, and their protein names.
+    - Inputs: Parent path of master protein/gene table from TAIR
+    - Outputs: `Protein_and_Genes_Unfiltered.txt` (TEMP), `Filtered_Arabidopsis_Protein_Info.tsv`
+
+
+
 ## Miscellaneous:
 - `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
-	- Inputs: Parent path of fpkm table, parent path of syntelog table, output directory
+	- Inputs: Parent path of FPKM table, parent path of syntelog table, output directory
 	- Outputs: Saves FPKM table as a tsv.
 
 ## Python Requirements:
