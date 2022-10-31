@@ -33,6 +33,21 @@ def read_GO_dir(input_directory):
     ]  # MAGIC substring for filename recognition
     return go_files
 
+def read_protein_table(filepath)
+    """
+    Read the table of Arabidopsis genes and protein ID/names that was
+    previously created.
+
+    Args:
+        filepath (str): Path to the table
+
+    Returns:
+        protein_table (pandas dataframe): columns=[Arabidopsis_Gene,
+        Protein_ID, Protein_Name]
+    """
+    protein_table = pd.read_csv(filepath, sep='\t', header='infer')
+    return protein_table
+
 
 def read_gene_modules_table(filepath):
     """
@@ -208,11 +223,20 @@ def read_synteny_homology_table(filepath):
     return synteny_homology_table
 
 
+def read_interesting_modules(filepath):
+    """
+    TODO
+    """
+    colnames = ["Modules"]
+    interesting_modules = pd.read_csv(filepath, names=colnames, header=None, sep="\t")
+    return interesting_modules
+
+
 def read_interesting_GO_terms(filepath):
     """
     TODO
     """
-    colnames = ["GO_ID", "GO_Term"]
+    colnames = ["GO_ID"]
     interesting_go_terms = pd.read_csv(filepath, names=colnames, header=None, sep="\t")
     return interesting_go_terms
 
