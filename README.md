@@ -74,12 +74,14 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Outputs: Creates a csv in the output directory of the unified dataframe.
 
 ## Proteins:
-- `protein_table.py`: Filters the master TAIR Arabidopsis protein table to a
-  more manageable format. Generates a table of Arabidopsis genes, their protein
-  ID, and their protein names.
+- `protein_table.py`: Filters the master TAIR Arabidopsis protein table to a more manageable format. Generates a table of Arabidopsis genes, their protein ID, and their protein names.
     - Inputs: Parent path of master protein/gene table from TAIR
     - Outputs: `Protein_and_Genes_Unfiltered.txt` (TEMP), `Filtered_Arabidopsis_Protein_Info.tsv`
 
+## Module Overlap:
+- `module_go_overlap.py`: Filters several datasets to show a set of interesting GO terms and their representation in the gene modules. 
+	- Inputs:  See docstring
+	- Outputs:  See docstring
 
 
 ## Miscellaneous:
