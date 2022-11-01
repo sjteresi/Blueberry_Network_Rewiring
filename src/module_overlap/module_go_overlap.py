@@ -2,6 +2,22 @@
 
 """
 Filter GO data. Determine overlap with modules from WGCNA.
+
+Creates pandas table and saves to disk Interesting_GO_Terms_Module_Representation.tsv
+
+    Returns:
+        data (pandas.DataFrame):
+            Index:
+                RangeIndex: 0-1345
+            Columns:
+                Blueberry_Gene: Object, dtype: object
+                Module_Color: Object, dtype: object
+                GO_TERM: Object, dtype: object
+                GO_ID (VARIES): Object, dtype: object
+                Arabidopsis_Gene: Object, dtype: object
+                Log2FC_Expression (VARIES, multiple columns): Object, dtype: object
+                Protein_ID: Object, dtype: object
+                Protein_Name: Object, dtype: object
 """
 
 __author__ = "Scott Teresi"
@@ -319,11 +335,11 @@ if __name__ == "__main__":
     # ------------------------------------------
     # NOTE
     # Read and add the protein table
-    proteins = read_protein_table(args.protein_table)
     # Note this will duplicate some rows because some of the information in the
     # protein table is duplicated (duplicate genes) with SLIGHTlY different
     # protein descriptions. I feel that may be best to leave it in the final
     # product, but will discuss with Melanie
+    proteins = read_protein_table(args.protein_table)
     data = data.merge(proteins, how="inner", on=["Arabidopsis_Gene"])
 
     # ------------------------------------------
@@ -331,16 +347,13 @@ if __name__ == "__main__":
     # going to get the blueberry gene in MULTIPLE modules, which isn't real.
     # This was referenced in an earlier note, we remove via an inner join.
     # Basically use the whitelist df as a whitelist to perform a 2 col inner join on.
-
     whitelist = read_gene_modules_table(args.master_gene_module_table)
     data = whitelist.merge(data, on=["Blueberry_Gene", "Module_Color"], how="inner")
     data.sort_values(by=["Blueberry_Gene"], inplace=True)
 
-    # print(data[data.duplicated(subset=["Blueberry_Gene"], keep=False)])
-
-    # data[data.duplicated(subset=["Blueberry_Gene"], keep=False)].to_csv(
-    # "test.tsv", sep="\t", header=True, index=False
-    # )
+    # NB if you want to see just the rows where a blueberry gene repeats
+    # x = data[data.duplicated(subset=["Blueberry_Gene"], keep=False)]
+    # print(x)
 
     # Save the data table
     data.to_csv(
