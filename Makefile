@@ -141,7 +141,6 @@ module_go_overlap:
 	mkdir -p $(DEV_RESULTS)/module_overlap/module_go_overlap/
 	python $(ROOT_DIR)/src/module_overlap/module_go_overlap.py \
 	       $(DEV_RESULTS)/GO/topGO/ \
-	       $(DEV_RESULTS)/WGCNA/Genes_and_ModuleColors.tsv \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/List_Top_10_GO.tsv \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/List_Top_11_Modules.tsv \
 	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
@@ -150,6 +149,15 @@ module_go_overlap:
 	       $(DEV_RESULTS)/proteins/Filtered_Arabidopsis_Protein_Info.tsv \
 	       $(DEV_WGCNA_GENES_AND_MODULES) \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/
+
+
+module_expression_graphs:
+	mkdir -p $(DEV_RESULTS)/modules/graphs_of_expression/
+	python $(ROOT_DIR)/src/modules/module_expression_graphs.py \
+	$(DEV_WGCNA_GENES_AND_MODULES) \
+	$(DEV_RESULTS)/FPKM_TPM/Blueberry_TPM_All_Haplotype.tsv \
+	$(DEV_RESULTS)/modules/graphs_of_expression/
+
 
 sync_local_to_remote_data:
 	rsync -ave ssh /home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/data --chmod=Dg+s teresisc@rsync.hpcc.msu.edu:/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/
