@@ -177,11 +177,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("go_dir", type=str, help="output from topGO")
     parser.add_argument(
-        "genes_and_module_colors",
-        type=str,
-        help="file representing the blueberry genes and their module IDs",
-    )
-    parser.add_argument(
         "interesting_go_terms",
         type=str,
         help="file representing the interesting GO terms received from Melanie",
@@ -194,7 +189,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "log2fc_expression_data",
         type=str,
-        help="file representing the gene expression data",
+        help="folder for the Log2FC gene expression data",
     )
     parser.add_argument(
         "orthologs",
@@ -228,7 +223,6 @@ if __name__ == "__main__":
     # NB set args
     args = parser.parse_args()
     args.go_dir = os.path.abspath(args.go_dir)
-    args.genes_and_module_colors = os.path.abspath(args.genes_and_module_colors)
     args.interesting_go_terms = os.path.abspath(args.interesting_go_terms)
     args.interesting_modules = os.path.abspath(args.interesting_modules)
     args.log2fc_expression_data = os.path.abspath(args.log2fc_expression_data)
