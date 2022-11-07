@@ -151,6 +151,11 @@ module_go_overlap:
 	       $(DEV_WGCNA_GENES_AND_MODULES) \
 	       $(DEV_RESULTS)/module_overlap/module_go_overlap/
 
+pca:
+	python $(ROOT_DIR)/src/pca.py \
+	$(DEV_RESULTS)/FPKM_TPM/Blueberry_TPM_All_Haplotype.tsv \
+	$(DEV_RESULTS)
+
 sync_local_to_remote_data:
 	rsync -ave ssh /home/scott/Documents/Uni/Research/Projects/Blueberry_Network_Rewiring/data --chmod=Dg+s teresisc@rsync.hpcc.msu.edu:/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/
 
