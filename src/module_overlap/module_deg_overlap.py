@@ -5,6 +5,16 @@ Filter DEG representation data. Determine overlap with modules from
 WGCNA.
 
 What modules have the highest or lowest amount of DEGs?
+
+NOTE the percentages in the final table are the percent of ALL DEGS for that
+expression context (e.g DRA_C1_vs_DRA_T1) that we were recovered in that
+specific blueberry module. For example, 23% of all the DEGs for the
+DRA_C1_vs_DRA_T1 expression context were recovered within the darkseagreen3
+module. This is further broken down by the up and down percentages values,
+which sum to the total of 23%. The up or down percentage values are not
+percentages of up or down genes respectively, they are the percentage of the
+total. I only divide by the total to establish percentage, not each
+subcategory.
 """
 
 __author__ = "Scott Teresi"
