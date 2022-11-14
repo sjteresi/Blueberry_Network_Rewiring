@@ -106,7 +106,7 @@ gene_stats_all:    # execute gene stats
 
 generate_exp_table_melanie:
 	mkdir -p $(DEV_RESULTS)/melanie_exp_syn_table
-	python3 $(ROOT_DIR)/src/exp_table_melanie.py $(DEV_DATA)/FPKM/Blueberry_FPKM_All.tsv $(DEV_DATA)/AtBB/data_output/merged_homo_and_syn.tsv $(DEV_RESULTS)/melanie_exp_syn_table
+	python3 $(ROOT_DIR)/src/exp_table_melanie.py $(DEV_RESULTS)/FPKM_TPM/Blueberry_FPKM_All_Haplotype.tsv $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv $(DEV_RESULTS)/melanie_exp_syn_table
 
 # Filter Log2FC
 module_log2fc_overlap:
