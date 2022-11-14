@@ -118,6 +118,7 @@ def read_all_DEG_direction_files(deg_files):
          TODO fill in to be more descriptive for the structure
     """
     list_of_read_deg_files = []
+    analysis_contexts = []
     for deg_path in deg_files:
         individual_deg_file = pd.read_csv(deg_path, sep="\t", header="infer")
 
@@ -141,12 +142,9 @@ def read_all_DEG_direction_files(deg_files):
             },
             inplace=True,
         )  # MAGIC column name
-        individual_deg_file = convert_direction_integer_to_string(
-            individual_deg_file, analysis_context
-        )
+        analysis_contexts.append(analysis_context)
         list_of_read_deg_files.append(individual_deg_file)
-
-    return list_of_read_deg_files
+    return (list_of_read_deg_files, analysis_contexts)
 
 
 def convert_direction_integer_to_string(deg_panda_file, analysis_context):

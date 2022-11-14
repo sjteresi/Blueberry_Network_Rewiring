@@ -27,6 +27,7 @@ from src.read_tables_and_dir import (
     read_all_DEG_direction_files,
     read_GO_ID_w_term,
     read_synteny_homology_table,
+    convert_direction_integer_to_string,
 )
 
 
@@ -347,7 +348,12 @@ if __name__ == "__main__":
 
     # NOTE begin reading data
     list_of_deg_paths = read_DEG_dir(args.DEG_dir)
-    list_of_deg_pandas = read_all_DEG_direction_files(list_of_deg_paths)
+    list_of_deg_pandas, analysis_contexts = read_all_DEG_direction_files(
+        list_of_deg_paths
+    )
+    list_of_deg_pandas_vals_as_str = list(
+        map(convert_direction_integer_to_string, list_of_deg_pandas, analysis_contexts)
+    )
     orthology_table = read_synteny_homology_table(args.orthology_file)
 
     # NOTE unused while waiting to hear back from Melanie on formatting ideas

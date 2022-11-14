@@ -27,6 +27,7 @@ from src.read_tables_and_dir import (
     read_all_DEG_direction_files,
     read_synteny_homology_table,
     read_gene_modules_table,
+    convert_direction_integer_to_string,
 )
 
 
@@ -72,12 +73,24 @@ def count_direction_of_regulation_per_module_deg(all_merged):
             .value_counts()
             .unstack()
         )
+
+        # NB edge-case where we have zero differentially expressed genes,
+        # wouldn't work with the groupby, valuecounts, unstack combo above,
+        # resulting in situation where you never get that column. For example,
+        # LIB_C2_vs_LIB_T2_Direction_Up doesn't have any genes for this
+        # category, which would result in a dataframe without that column,
+        # which was confusing. I want the column even if it is full of zeroes
+        if "Up" not in x.columns:
+            x["Up"] = np.nan
+        if "Down" not in x.columns:
+            x["Down"] = np.nan
+
         comparison_name = x.columns.name
         x = x.add_prefix(comparison_name + "_")
         x = x.rename_axis(None, axis=1)
         counts_per_module_comparison.append(x)
         col_list = [col for col in x.columns if "No_Change" not in col]
-        x[direction_column + "_Total_DEGS"] = x[col_list].sum(axis=1)
+        x[direction_column + "_Total_DEGs"] = x[col_list].sum(axis=1)
 
     # Perform a pandas merge on a list
     counts = reduce(
@@ -126,11 +139,44 @@ if __name__ == "__main__":
 
     # NOTE begin the analysis
     list_of_deg_paths = read_DEG_dir(args.DEG_dir)
-    list_of_deg_pandas = read_all_DEG_direction_files(list_of_deg_paths)
+    list_of_deg_pandas, analysis_contexts = read_all_DEG_direction_files(
+        list_of_deg_paths
+    )
+    # ----------------------
+    # NOTE FUTURE, gettig this 'to_sum' and 'summed' object could be placed in
+    # a function for enhanced legibility.
+    to_sum = reduce(
+        lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
+        list_of_deg_pandas,
+    )
+    to_sum.set_index("Blueberry_Gene", inplace=True)
+    all_col = to_sum.columns
+    for col in all_col:
+        to_sum.loc[to_sum[col] == -1, col + "_Direction_Down"] = 1
+        to_sum.loc[to_sum[col] == 1, col + "_Direction_Up"] = 1
+
+        # NB, adding the statement for 0 values because in some edge cases
+        # where there were zero DEGs, it would never make the column.
+        # E.g LIB_C2_vs_LIB_T2_Direction_Up would never get made because there
+        # were zero upregulated genes
+        to_sum.loc[to_sum[col] == 0, col + "_Direction_Down"] = 0
+        to_sum.loc[to_sum[col] == 0, col + "_Direction_Up"] = 0
+        to_sum.fillna(0, inplace=True)
+        to_sum[col + "_Direction_Total_DEGs"] = (
+            to_sum[col + "_Direction_Down"] + to_sum[col + "_Direction_Up"]
+        )
+        to_sum.drop(columns=[col], inplace=True)
+
+    summed = to_sum.sum(axis=0)
+
+    list_of_deg_pandas_vals_as_str = [
+        convert_direction_integer_to_string(panda, context)
+        for panda, context in zip(list_of_deg_pandas, analysis_contexts)
+    ]
 
     merged_deg_no_module_ID = reduce(
         lambda left, right: pd.merge(left, right, on="Blueberry_Gene", how="outer"),
-        list_of_deg_pandas,
+        list_of_deg_pandas_vals_as_str,
     )
 
     merged_deg_w_module_ID = pd.merge(
@@ -179,6 +225,7 @@ if __name__ == "__main__":
         columns=["Number_of_Blueberry_Genes_in_Module"], inplace=True
     )  # NB remove column
     percentages = percentages.add_prefix("Percent_")  # NB add prefix to column
+
     # NOTE FUTURE
     # Get gene counts per module again because the number of blueberry genes
     # per module column was set to 1 because of division, in future figure out
@@ -188,15 +235,22 @@ if __name__ == "__main__":
     percentages = percentages.merge(
         gene_counts_per_module, on="Module_Color", how="outer"
     )
+    summed = summed.add_prefix("Percent_")
+    summed_frame = summed.to_frame("Gene_Counts_Per_Context")
 
     percentages.set_index("Module_Color", inplace=True)
-    percentages.sort_index(axis=1, inplace=True, ascending=False)
-    top_n_modules_and_percent_per_context(percentages, args.output_dir)
-
-    # MAGIC filename
-    percentages.to_csv(
+    transposed_percentages = percentages.T
+    percentages_and_counts = transposed_percentages.merge(
+        summed_frame, left_index=True, right_index=True, how="outer"
+    )
+    percentages_and_counts.to_csv(
         os.path.join(args.output_dir, "DEG_percentages_in_modules.tsv"),
         sep="\t",
         header=True,
         index=True,
     )
+
+    # NOTE this is old code but still useful, accessory data tables to
+    # 'percentages_and_counts'
+    percentages.sort_index(axis=1, inplace=True, ascending=False)
+    top_n_modules_and_percent_per_context(percentages, args.output_dir)
