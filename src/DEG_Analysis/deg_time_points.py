@@ -317,6 +317,60 @@ def graph_line_plot_deg_per_context(merged_deg_no_module_ID, output_dir):
     )
 
 
+def get_at_least_one_deg_w_ortho(degs_and_ortho):
+    """
+    Generate a table in which a blueberry gene is found to be a DEG in AT LEAST
+    one DEG comparison context AND that blueberry gene must have an Arabidopsis
+    ortholog
+    """
+    # NB MAGIC column names and column values for non-deg status and no
+    # ortholog status
+
+    degs_and_ortho = degs_and_ortho.set_index("Blueberry_Gene")
+    columns = degs_and_ortho.columns
+
+    # The lines below eliminate columns such as "Lib C3 vs Dra C3", which are
+    # comparisons we aren't interested in
+    only_draper_colnames = [genome for genome in columns if "LIB" not in genome]
+    only_liberty_colnames = [genome for genome in columns if "DRA" not in genome]
+    # NB set to remove duplicate 'Arabidopsis_Gene' column
+    direction_cols = list(set(only_draper_colnames + only_liberty_colnames))
+
+    # Remove the DEG columns we aren't interested in but keep Arabidopsis for
+    # now
+    degs_and_ortho = degs_and_ortho.filter(items=direction_cols)
+    direction_cols.remove("Arabidopsis_Gene")
+
+    # Begin filtering pandaframe by whether or not we observe a gene being a
+    # DEG in at least once comparison context
+    boolean_filtered_degs = degs_and_ortho[direction_cols] != "No_Change"
+    bool_mask = boolean_filtered_degs.any(axis=1)
+    at_least_one_deg = degs_and_ortho[bool_mask]
+
+    print(
+        f"""There are {len(at_least_one_deg)} unique blueberry genes that are
+          DEGs in at least one DEG comparison context, not all may have an AT
+          ortholog"""
+    )
+
+    # Make sure we have ortholog information for that Arabidopsis gene
+    at_least_one_deg_w_ortholog = at_least_one_deg.loc[
+        at_least_one_deg["Arabidopsis_Gene"] != "No_Ortholog"
+    ]
+    print(
+        f"""There are {len(at_least_one_deg_w_ortholog)} unique blueberry genes that are
+          DEGs in at least one DEG comparison context and these genes also have
+          an AT ortholog."""
+    )
+
+    # Sort the columns
+    at_least_one_deg_w_ortholog = at_least_one_deg_w_ortholog.reindex(
+        sorted(at_least_one_deg_w_ortholog.columns), axis=1
+    )
+
+    return at_least_one_deg_w_ortholog
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     # NB input args correspond to Makefile, must be ordered correctly
@@ -369,6 +423,14 @@ if __name__ == "__main__":
     )
     all_degs_and_gene_names.drop(columns=["E_Value", "Point_of_Origin"], inplace=True)
     all_degs_and_gene_names.fillna("No_Ortholog", inplace=True)
+
+    at_least_one_deg_w_ortholog = get_at_least_one_deg_w_ortho(all_degs_and_gene_names)
+    at_least_one_deg_w_ortholog.to_csv(
+        os.path.join(args.output_dir, "Unique_DEGs_w_orthologs.tsv"),
+        header=True,
+        index=True,
+        sep="\t",
+    )
 
     # NOTE this is a unique special result folder
     graph_venn_diagram_deg_per_context(
