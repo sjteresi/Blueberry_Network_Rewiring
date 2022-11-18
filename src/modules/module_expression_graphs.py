@@ -57,6 +57,15 @@ graph_groups = {
         "Lib_6dpo_Control_Mean",
         "Lib_7dpo_Control_Mean",
     ],
+    "All": [
+        "All_1dpo_Data_Mean",
+        "All_2dpo_Data_Mean",
+        "All_3dpo_Data_Mean",
+        "All_4dpo_Data_Mean",
+        "All_5dpo_Data_Mean",
+        "All_6dpo_Data_Mean",
+        "All_7dpo_Data_Mean",
+    ],
 }
 
 
@@ -67,6 +76,7 @@ def gen_whitelist(expression_table_columns):
         draper_treatment_key = "Dra_" + str(i) + "dpo_" + "Treatment"
         liberty_control_key = "Lib_" + str(i) + "dpo_" + "Control"
         liberty_treatment_key = "Lib_" + str(i) + "dpo_" + "Treatment"
+        all_data_key = "All_" + str(i) + "dpo_" + "Data"
         draper_treatments = [
             col
             for col in expression_table_columns
@@ -87,19 +97,36 @@ def gen_whitelist(expression_table_columns):
             for col in expression_table_columns
             if ("Lib" in col) and (str(i) + "dpo" in col) and ("c" in col)
         ]
+        all_data = [col for col in expression_table_columns if str(i) + "dpo" in col]
         whitelist[draper_control_key] = draper_controls
         whitelist[draper_treatment_key] = draper_treatments
         whitelist[liberty_control_key] = liberty_controls
         whitelist[liberty_treatment_key] = liberty_treatments
+        whitelist[all_data_key] = all_data
     return whitelist
 
 
 def get_context_means(whitelist, expression):
     for key, val in whitelist.items():
         expression[key + "_Mean"] = expression[val].mean(axis=1)
-        expression.drop(columns=val, inplace=True)
-    expression = expression.reindex(sorted(expression.columns), axis=1)
+        # expression = expression.filter([key + "_Mean", "Blueberry_Gene"])
+        expression = expression.reindex(sorted(expression.columns), axis=1)
     return expression
+
+
+def gen_inclusive_graph(genes_modules_and_expression, output_dir):
+    print(genes_modules_and_expression)
+    raise ValueError
+    for module in modules_of_interest:
+        subsetted_by_module = genes_modules_and_expression[
+            genes_modules_and_expression["Module_Color"] == module
+        ].copy(deep=True)
+        subsetted_by_module.drop(columns=["Module_Color"], inplace=True)
+        # subsetted_by_module = subsetted_by_module.filter(items=exp_columns)
+
+        transposed = subsetted_by_module.transpose()
+        transposed.sort_index(inplace=True)
+        print(transposed)
 
 
 if __name__ == "__main__":
@@ -127,6 +154,9 @@ if __name__ == "__main__":
     # Mutate expression to have the column means now
     whitelist = gen_whitelist(expression.columns.to_list())
     expression = get_context_means(whitelist, expression)
+    for key, val in whitelist.items():
+        if "All" not in key:
+            expression.drop(columns=val, inplace=True)
 
     # Add in columns of 'Module_Color'
     genes_modules_and_expression = pd.merge(
@@ -137,6 +167,7 @@ if __name__ == "__main__":
     # NOTE, MAGIC these are Module IDs that we identified a priori
     modules_of_interest = ["darkseagreen3", "plum3", "palevioletred2", "lightpink3"]
 
+    # gen_inclusive_graph(genes_modules_and_expression, args.output_dir)
     for grouping_title, exp_columns in graph_groups.items():
         # NOTE MAGIC, split the first element of the group into pieces and tie
         # them together to get a name for the group.
@@ -144,8 +175,12 @@ if __name__ == "__main__":
         # FUTURE, melanie may want this changed later
         if "Lib" in grouping_title:
             genome_color = "red"
-        if "Dra" in grouping_title:
+        elif "Dra" in grouping_title:
             genome_color = "blue"
+        elif "All" in grouping_title:
+            genome_color = "purple"
+        else:
+            raise ValueError("Group title error")
 
         for module in modules_of_interest:
             subsetted_by_module = genes_modules_and_expression[
