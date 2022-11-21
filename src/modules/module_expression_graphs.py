@@ -70,6 +70,12 @@ graph_groups = {
 
 
 def gen_whitelist(expression_table_columns):
+    """
+    Generates a dictionary of expression columns in the raw TPM data and
+    assigns the columns a context key. For example, Lib_6dpo_c2_S65_L007 gets
+    assigned to 'Lib 6 dpo Control' and is grouped with the other RNA-seq
+    replicates.
+    """
     whitelist = {}
     for i in range(1, 8, 1):
         draper_control_key = "Dra_" + str(i) + "dpo_" + "Control"
@@ -107,26 +113,14 @@ def gen_whitelist(expression_table_columns):
 
 
 def get_context_means(whitelist, expression):
+    """
+    Generates a new column for the gene expression mean of each RNA-seq
+    grouping
+    """
     for key, val in whitelist.items():
         expression[key + "_Mean"] = expression[val].mean(axis=1)
-        # expression = expression.filter([key + "_Mean", "Blueberry_Gene"])
         expression = expression.reindex(sorted(expression.columns), axis=1)
     return expression
-
-
-def gen_inclusive_graph(genes_modules_and_expression, output_dir):
-    print(genes_modules_and_expression)
-    raise ValueError
-    for module in modules_of_interest:
-        subsetted_by_module = genes_modules_and_expression[
-            genes_modules_and_expression["Module_Color"] == module
-        ].copy(deep=True)
-        subsetted_by_module.drop(columns=["Module_Color"], inplace=True)
-        # subsetted_by_module = subsetted_by_module.filter(items=exp_columns)
-
-        transposed = subsetted_by_module.transpose()
-        transposed.sort_index(inplace=True)
-        print(transposed)
 
 
 if __name__ == "__main__":
@@ -151,13 +145,22 @@ if __name__ == "__main__":
     genes_and_modules = read_gene_modules_table(args.master_gene_module_table)
     expression = read_FPKM_or_TPM(args.gene_expression_table)
 
-    # Mutate expression to have the column means now
+    # Decipher the various RNA-seq library names to later coalesce into the
+    # true RNA-seq means
     whitelist = gen_whitelist(expression.columns.to_list())
+    # Mutate expression pandaframe to have the column means
     expression = get_context_means(whitelist, expression)
     for key, val in whitelist.items():
         if "All" not in key:
             expression.drop(columns=val, inplace=True)
 
+    # Save the dataframe of expression means to disk
+    expression.set_index("Blueberry_Gene").to_csv(
+        os.path.join(args.output_dir, "Mean_Expression_TPM.tsv"),
+        sep="\t",
+        header=True,
+        index=True,
+    )
     # Add in columns of 'Module_Color'
     genes_modules_and_expression = pd.merge(
         expression, genes_and_modules, how="inner", on="Blueberry_Gene"
@@ -167,7 +170,6 @@ if __name__ == "__main__":
     # NOTE, MAGIC these are Module IDs that we identified a priori
     modules_of_interest = ["darkseagreen3", "plum3", "palevioletred2", "lightpink3"]
 
-    # gen_inclusive_graph(genes_modules_and_expression, args.output_dir)
     for grouping_title, exp_columns in graph_groups.items():
         # NOTE MAGIC, split the first element of the group into pieces and tie
         # them together to get a name for the group.
