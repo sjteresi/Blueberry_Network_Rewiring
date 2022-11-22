@@ -136,6 +136,12 @@ deg_time_points:
 	       $(DEV_SYNTENY_HOMOLOGY_TABLE) \
 	       $(DEV_RESULTS)/DEGs/
 
+deg_qtl:
+	python $(ROOT_DIR)/src/QTL/deg_qtl.py \
+	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
+	       $(DEV_RESULTS)/QTL/QTL_genes_of_interest.tsv \
+	       $(DEV_RESULTS)/QTL/
+
 # Filter GO by Modules
 module_go_overlap:
 	mkdir -p $(DEV_RESULTS)/module_overlap/module_go_overlap/
@@ -152,11 +158,11 @@ module_go_overlap:
 
 
 module_expression_graphs:
-	mkdir -p $(DEV_RESULTS)/modules/graphs_of_expression/
+	mkdir -p $(DEV_RESULTS)/module_expression/
 	python $(ROOT_DIR)/src/modules/module_expression_graphs.py \
 	$(DEV_WGCNA_GENES_AND_MODULES) \
 	$(DEV_RESULTS)/FPKM_TPM/Blueberry_TPM_All_Haplotype.tsv \
-	$(DEV_RESULTS)/modules/graphs_of_expression/
+	$(DEV_RESULTS)/module_expression/
 
 
 sync_local_to_remote_data:
