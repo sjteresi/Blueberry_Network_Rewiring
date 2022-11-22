@@ -83,6 +83,17 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs:  See docstring
 	- Outputs:  See docstring
 
+## QTL:
+- `deg_qtl.py`: Subsets the QTL output data of interesting genes to determine
+  which genes are DEGs.
+  - Inputs: Path of DEG results folder from EdgeR. Path of QTL output file (txt
+    file of gene names).
+  - Outputs: `all_qtl_genes.tsv` a file with DEG status columns appended to the
+    gene names, is each gene up or down regulated in a given DEG comparison
+    context? `at_least_one_deg_qtl_genes.tsv`, a subsetted `all_qtl_genes.tsv`
+    file, a gene is included in this file if it is a DEG in at least one DEG
+    comparison context.
+
 
 ## Miscellaneous:
 - `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
