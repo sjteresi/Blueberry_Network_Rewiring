@@ -15,51 +15,11 @@ import pandas as pd
 import os
 from functools import reduce
 
-from src.read_tables_and_dir import read_gene_modules_table
-
-
-def read_log_2fc_dir(input_directory):
-    """
-    Reads an input directory and returns a list of file paths that have the
-    magic substring '_FC.tsv' in it.
-
-    Args:
-        input_directory (str): Path to directory that contains files with our
-        magic substring.
-
-    Returns:
-        only_log2fc_files (list): List of file paths
-    """
-    only_log2fc_files = [
-        os.path.join(input_directory, f)
-        for f in os.listdir(input_directory)
-        if (os.path.isfile(os.path.join(input_directory, f)))
-        and ("Log2_fold_changes" in f)
-    ]  # MAGIC substring for filename recognition
-    if len(only_log2fc_files) != 14:
-        raise ValueError
-    return only_log2fc_files
-
-
-def read_all_log_2fc_files(list_log_2fc_files):
-    """
-    Reads a list of file paths and reads them as pandas files. Creates a list
-    of pandas dataframes. Magic column names are read from the file
-
-    Args:
-        list_log_2fc_files (str): Output from read_log_2fc_dir function. List
-        of file paths.
-
-    Returns:
-        list_of_log_2fc_files_read (list): List of pandas dataframes
-    """
-    list_of_log_2fc_files_read = [
-        pd.read_csv(x, sep="\t", header="infer").drop(
-            columns=["Arabidopsis_Gene", "E_Value", "Point_of_Origin"]
-        )
-        for x in list_log_2fc_files
-    ]  # MAGIC column names for file column recognition
-    return list_of_log_2fc_files_read
+from src.read_tables_and_dir import (
+    read_gene_modules_table,
+    read_log_2fc_dir,
+    read_all_log_2fc_files,
+)
 
 
 def count_direction_of_regulation_per_module_log2fc(all_merged):
