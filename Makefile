@@ -139,7 +139,11 @@ deg_time_points:
 deg_qtl:
 	python $(ROOT_DIR)/src/QTL/deg_qtl.py \
 	       $(DEV_DIFFEXDIR)/All_Hap/FDR/ \
-	       $(DEV_RESULTS)/QTL/QTL_genes_of_interest.tsv \
+	       $(DEV_RESULTS)/QTL/QTL_genes_of_interest.csv \
+	       $(DEV_RESULTS)/module_expression/Mean_Expression_TPM.tsv \
+	       $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv \
+	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
+	       $(DEV_RESULTS)/proteins/Filtered_Arabidopsis_Protein_Info.tsv \
 	       $(DEV_RESULTS)/QTL/
 
 # Filter GO by Modules
