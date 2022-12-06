@@ -144,6 +144,7 @@ deg_qtl:
 	       $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv \
 	       $(DEV_RESULTS)/Log_2FC_Melanie/ \
 	       $(DEV_RESULTS)/proteins/Filtered_Arabidopsis_Protein_Info.tsv \
+	       $(DEV_RESULTS)/GO/GO_ID_w_Term.tsv \
 	       $(DEV_RESULTS)/QTL/
 
 # Filter GO by Modules

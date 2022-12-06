@@ -38,6 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("orthologs", type=str, help="synteny homology table")
     parser.add_argument("log2fc_dir", type=str, help="log_2fc_info")
     parser.add_argument("protein_info", type=str, help="protein_info")
+    parser.add_argument("go_table")
     parser.add_argument("output_dir", type=str, help="output_dir path")
 
     # NB set args
@@ -48,6 +49,7 @@ if __name__ == "__main__":
     args.orthologs = os.path.abspath(args.orthologs)
     args.log2fc_dir = os.path.abspath(args.log2fc_dir)
     args.protein_info = os.path.abspath(args.protein_info)
+    args.go_table = os.path.abspath(args.go_table)
     args.output_dir = os.path.abspath(args.output_dir)
 
     # NB set logging
@@ -119,15 +121,14 @@ if __name__ == "__main__":
     columns_of_interest = [
         col for col in expression_data.columns.to_list() if "All_" not in col
     ]
-    any_expression_bool = (expression_data[columns_of_interest] != 0).any(axis=1)
-    any_expression_at_all = expression_data[any_expression_bool]
-    qtl_genes = pd.merge(
-        any_expression_at_all, qtl_genes, on="Blueberry_Gene", how="inner"
+    qtl_genes_with_general_expression = pd.merge(
+        qtl_genes, expression_data, on="Blueberry_Gene", how="left"
     )
-    qtl_genes_with_any_expression_at_all = qtl_genes.copy(deep=True)
-    qtl_genes_with_any_expression_at_all.drop(columns=log2fc_col, inplace=True)
-    qtl_genes_with_any_expression_at_all.sort_index(axis=1, inplace=True)
-    num_unique_bb_genes_with_any_expression = qtl_genes_with_any_expression_at_all[
+    any_expression_bool = (
+        qtl_genes_with_general_expression[columns_of_interest] != 0
+    ).any(axis=1)
+    any_expression_at_all = qtl_genes_with_general_expression[any_expression_bool]
+    num_unique_bb_genes_with_any_expression = any_expression_at_all[
         "Blueberry_Gene"
     ].nunique()
 
@@ -135,8 +136,16 @@ if __name__ == "__main__":
         f"This is how many unique blueberry genes were generally expressed in at least one context: {num_unique_bb_genes_with_any_expression}"
     )
 
-    print(qtl_genes)
-    # Save the data
+    go_info = pd.read_csv(args.go_table, sep="\t", header="infer")
+    test = pd.merge(qtl_genes, go_info, on="Arabidopsis_Gene", how="left")
+    test.fillna("NA", inplace=True)
+    test.to_csv(
+        os.path.join(args.output_dir, "candidate_genes_qtl_table_w_GO.tsv"),
+        sep="\t",
+        header=True,
+        index=False,
+    )
+
     qtl_genes.sort_index(axis=1, inplace=True)
     qtl_genes.to_csv(
         os.path.join(args.output_dir, "candidate_genes_qtl_table.tsv"),
