@@ -36,6 +36,9 @@ DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_DATA)/ATH_GO_GOSLIM.txt
 DEV_FILTERED_GO_OUTPUT := $(DEV_RESULTS)/GO/ArabidopsisGene_w_GO.tsv
 DEV_FILTERED_GO_OUTPUT_DIR := $(DEV_RESULTS)/GO/
 
+DEV_DRAPER_DEG := $(DEV_RESULTS)/DEGs/Unique_and_Shared_DEGs/Unique_Draper_All.txt
+DEV_LIBERTY_DEG := $(DEV_RESULTS)/DEGs/Unique_and_Shared_DEGs/Unique_Liberty_All.txt
+
 
 .PHONY: dev help
 
@@ -74,8 +77,8 @@ filter_GO:
 # NOTE need to go back and get filter modules code because those individually processed modules are used in TopGO
 # AND the data folder for top go should actually be a results folder
 topGO:
-	mkdir -p $(DEV_RESULTS)/GO/topGO
-	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/topGO $(DEV_DOCUMENTATION)
+	mkdir -p $(DEV_RESULTS)/GO/TopGO_Modules
+	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/TopGO_Modules $(DEV_DOCUMENTATION)
 
 filter_proteins:
 	mkdir -p $(DEV_RESULTS)/proteins
@@ -172,3 +175,20 @@ create_module_table:
 
 create_Log_2FC_histogram:
 	$(ROOT_DIR)/src/modules/log2fc_hist.py $(DEV_RESULTS)/Log_2FC_Melanie/Melanie_Log_2FC_Filtered.tsv $(DEV_RESULTS)/Log_2FC_Melanie/histograms.png
+
+
+get_lists_of_Arabidopsis_degs:
+	awk '{if($$1 != "No_Ortholog" && $$1 != "Arabidopsis_Gene") print $$1}' $(ROOT_DIR)/results/DEGs/Unique_and_Shared_DEGs/Unique_Draper_* > $(ROOT_DIR)/results/DEGs/Unique_and_Shared_DEGs/Unique_Draper_All.txt
+	awk '{if($$1 != "No_Ortholog" && $$1 != "Arabidopsis_Gene") print $$1}' $(ROOT_DIR)/results/DEGs/Unique_and_Shared_DEGs/Unique_Liberty* > $(ROOT_DIR)/results/DEGs/Unique_and_Shared_DEGs/Unique_Liberty_All.txt
+
+
+# NOTE I hate R and its package management is horrible. You cannot execute this 
+# Makefile command. You must be in the directory of the R script and execute it
+# yourself. If you don't do it that way, it won't load the R environment of installed
+# packages correctly. SO, that means this Makefile command is mainly just here for
+# reference.
+# I am also runnning this on the HPCC, so to load R itself:
+# module load GCC/8.3.0 OpenMPI/3.1.4 R/3.6.2
+topGO_deg:
+	mkdir -p $(DEV_RESULTS)/GO/TopGO_DEGs
+	Rscript $(ROOT_DIR)/src/TopGO/topGO_DEGs.R $(DEV_DRAPER_DEG) $(DEV_LIBERTY_DEG) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/TopGO_DEGs $(DEV_DOCUMENTATION)

@@ -10,9 +10,8 @@
 #install.packages("BiocManager")
 #BiocManager::install(lib='/home/scott/R/x86_64-pc-linux-gnu-library/4.1')
 #BiocManager::install("topGO", lib='/home/scott/R/x86_64-pc-linux-gnu-library/4.1', force=TRUE)
-#BiocManager::install("ALL")
 #BiocManager::install("Rgraphviz", lib='/home/scott/R/x86_64-pc-linux-gnu-library/4.1')
-
+renv::restore()
 suppressPackageStartupMessages(library(topGO))
 suppressPackageStartupMessages(library(Rgraphviz))
 suppressPackageStartupMessages(library(tidyverse))
@@ -105,14 +104,15 @@ function_run_topgo = function(master_genes, geneID2GO, my_interesting_genes, mod
 	write.table(allRes_significant, file=file.path(output_dir, paste(module_name, '_', ontology_group, "_",pval_threshold,"_pval_sig_GO_Summary_Table.tsv", sep='')), sep='\t', quote=FALSE, row.names=FALSE)
 
 	# Get the graphic of connected nodes colored by significance
-	outpdf = file.path(output_dir, paste(module_name,"_",ontology_group,"_",pval_threshold,"_pval_sig_GO_tree.pdf", sep=''))
-    	pdf(file=outpdf)
+	# NOTE, decided not to implement the figures, so not going to generate them
+	#outpdf = file.path(output_dir, paste(module_name,"_",ontology_group,"_",pval_threshold,"_pval_sig_GO_tree.pdf", sep=''))
+    	#pdf(file=outpdf)
 	# NB the nodes shown (rectanlges) are significant, and the
         # ovals are the connecting information? Unsure. 
 	# NB arbitrary number of sig nodes shown for display/legibility reasons
-    	showSigOfNodes(GOdata, score(resultFisher_classic), firstSigNodes = 15,
-		       useInfo ='all')	 
-    	dev.off()
+    	#showSigOfNodes(GOdata, score(resultFisher_classic), firstSigNodes = 15,
+		       #useInfo ='all')	 
+    	#dev.off()
 }
 
 for(input_module in files_w_tsv){	
@@ -125,9 +125,10 @@ for(input_module in files_w_tsv){
 	my_interesting_genes = as.character(my_interesting_genes$V1)
 
 	# Run the code and do each ontology group	
-	function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'MF', output_dir)
 	function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'BP', output_dir)
-	function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'CC', output_dir)
+	# NOTE, decided not to run the MF or CC groupings
+	#function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'MF', output_dir)
+	#function_run_topgo(master_genes, geneID2GO, my_interesting_genes, module_name, 'CC', output_dir)
 }
 
 # NB this outputs the session information for easy package management.
