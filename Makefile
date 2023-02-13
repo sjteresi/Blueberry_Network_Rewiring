@@ -73,13 +73,6 @@ filter_GO:
 	mkdir -p $(DEV_RESULTS)/GO
 	python $(ROOT_DIR)/src/TopGO/generate_gene_w_GO_term.py $(DEV_DOWNLOADED_GO_UNIVERSE) $(DEV_FILTERED_GO_OUTPUT_DIR)
 
-# Run TopGO to get over/under representation of terms
-# NOTE need to go back and get filter modules code because those individually processed modules are used in TopGO
-# AND the data folder for top go should actually be a results folder
-topGO:
-	mkdir -p $(DEV_RESULTS)/GO/TopGO_Modules
-	Rscript $(ROOT_DIR)/src/TopGO/topGO_blueberry.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/TopGO_Modules $(DEV_DOCUMENTATION)
-
 filter_proteins:
 	mkdir -p $(DEV_RESULTS)/proteins
 	python $(ROOT_DIR)/src/proteins/protein_table.py $(DEV_DATA)/TAIR10_pep_20101214.txt $(DEV_RESULTS)/proteins
@@ -192,3 +185,7 @@ get_lists_of_Arabidopsis_degs:
 topGO_deg:
 	mkdir -p $(DEV_RESULTS)/GO/TopGO_DEGs
 	Rscript $(ROOT_DIR)/src/TopGO/topGO_DEGs.R $(DEV_DRAPER_DEG) $(DEV_LIBERTY_DEG) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/TopGO_DEGs $(DEV_DOCUMENTATION)
+
+topGO_modules:
+	mkdir -p $(DEV_RESULTS)/GO/TopGO_Modules
+	Rscript $(ROOT_DIR)/src/TopGO/topGO_Modules.R $(DEV_MODULES_IN_AT) $(DEV_FILTERED_GO_OUTPUT) $(DEV_RESULTS)/GO/TopGO_Modules $(DEV_DOCUMENTATION)
