@@ -11,8 +11,8 @@ WGCNAnThreads()
 load_all_hap_hpcc = function() {
   # Read in the blueberry data set
   # Each row is a gene and each column is a library.
-  setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Data/TPM")
-  AllHap_BlueberryData = read.csv("Blueberry_TPM_All.tsv", header = TRUE, sep =
+  setwd("/mnt/research/edgerpat_lab/Scotty/Blueberry_Network_Rewiring/results/FPKM_TPM")
+  AllHap_BlueberryData = read.csv("Blueberry_TPM_All_Haplotype.tsv", header = TRUE, sep =
                                     '\t')
   return(AllHap_BlueberryData)
 }
