@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-# TODO edit description to remove references to differential expression set and
-# describe that this step is for TOPGO. Describe better that we are only
-# dropping dupliccates on a module-by-module basis
 """
 Execution file
 
 Find union of differential expression / orthology set with the WGCNA output of
 genes assigned to modules.
+
+Pre-processing step for TopGO. We need to get the orthologs of the gene modules
+so we can analyze the gene functions of the modules.
+
+We are only dropping duplicates on a module-by-module basis
 """
 
 __author__ = "Scott Teresi"
