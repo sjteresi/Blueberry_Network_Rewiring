@@ -5,6 +5,11 @@ Master code file.
 Filter homolog (BLAST) data
 Filter syntelog (SynMap) data
 Merge both files together
+
+Makes:
+    Filtered_Homologs.tsv
+    Filtered_Syntelogs.tsv
+    Synteny_Homology_Table.tsv
 """
 
 __author__ = "Scott Teresi"
@@ -52,6 +57,7 @@ def process(
     # Merge the synteny and homology data
     logger.info("Merging the data...")
     merged_all = merge_homo_synt(syntelogs, homologs)
+
     # Save synteny/homology data to disk
     # MAGIC filename
     file_to_save = os.path.join(data_output_path, "Synteny_Homology_Table.tsv")
@@ -65,16 +71,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filter orthologs")
     path_main = os.path.abspath(__file__)
     parser.add_argument(
-        "syntelog_input_file", type=str, help="parent path of syntelog file"
+        "syntelog_input_file",
+        type=str,
+        help="parent path of syntelog file derived from SynMap",
     )
     parser.add_argument(
-        "homolog_input_file", type=str, help="parent path of homolog file"
+        "homolog_input_file",
+        type=str,
+        help="parent path of homolog file derived from BLAST",
     )
 
     parser.add_argument(
-        "output_directory",
+        "output_path",
         type=str,
-        help="parent path of output directory",
+        help="parent path of output files",
     )
 
     parser.add_argument(
@@ -84,7 +94,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.syntelog_input_file = os.path.abspath(args.syntelog_input_file)
     args.homolog_input_file = os.path.abspath(args.homolog_input_file)
-    args.output_directory = os.path.abspath(args.output_directory)
+    args.output_path = os.path.abspath(args.output_path)
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
@@ -94,5 +104,5 @@ if __name__ == "__main__":
     process(
         args.syntelog_input_file,
         args.homolog_input_file,
-        args.output_directory,
+        args.output_path,
     )

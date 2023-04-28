@@ -101,7 +101,7 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Outputs: Saves FPKM table as a tsv.
 
 ## Python Requirements:
-We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`.
+We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`. Python 3.6.4
 
 # Methods Descriptions:
 ## Ortholog Identification
