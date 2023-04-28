@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 """
-Calculates the proportions of each gene belonging to each identification type.
+Calculates the proportions of each gene in the genome belonging to each
+identification type (Synteny, BLAST, Not found)
 """
 
-__author__ = "Alder Fulton"
+__author__ = "Alder Fulton, Scott Teresi"
 
 import argparse
 import os
@@ -12,18 +13,17 @@ import pandas as pd
 import numpy as np
 
 
-def process(genome_file, orthology_file, efilter):
-    """"
+def process(gene_annotation, orthology_file, efilter):
+    """
     Args:
-       genome_file (str): path to the csv containing the data for different genes.
+       gene_annotation (str): path to the csv containing the data for different genes.
        orthology_file: path to the orthology file containg the different identification types.
 
     Returns:
         None. Prints the proportions of each gene.
 
     """
-
-    # Import genome_file
+    # Import gene_annotation
     col_names = [
         "Chromosome",
         "Software",
@@ -42,7 +42,7 @@ def process(genome_file, orthology_file, efilter):
     ]
 
     genes_df = pd.read_csv(
-        genome_file,
+        gene_annotation,
         delimiter="\t",
         header=None,
         engine="python",
@@ -56,7 +56,10 @@ def process(genome_file, orthology_file, efilter):
 
     # Import orthology_file
     orthology_df = pd.read_csv(
-        orthology_file, delimiter="\t", header="infer", engine="python",
+        orthology_file,
+        delimiter="\t",
+        header="infer",
+        engine="python",
     )
     orthology_df.drop(columns=["Arabidopsis_Gene"], inplace=True)
     # Column name is E_Value
@@ -101,10 +104,14 @@ if __name__ == "__main__":
     )  # The path that leads you to this file, not including this file.
 
     parser.add_argument(
-        "genome_file", type=str, help="parent path to the genome file",
+        "gene_annotation",
+        type=str,
+        help="parent path to the gene annotation file",
     )
     parser.add_argument(
-        "orthology_file", type=str, help="parent path to the synteny/BLAST file",
+        "orthology_file",
+        type=str,
+        help="parent path to the synteny/BLAST file",
     )
     parser.add_argument(
         "--e_filter",
@@ -113,7 +120,7 @@ if __name__ == "__main__":
         default=1e-5,
     )
     args = parser.parse_args()
-    args.genome_file = os.path.abspath(args.genome_file)
+    args.gene_annotation = os.path.abspath(args.gene_annotation)
     args.orthology_file = os.path.abspath(args.orthology_file)
 
-    process(args.genome_file, args.orthology_file, args.e_filter)
+    process(args.gene_annotation, args.orthology_file, args.e_filter)
