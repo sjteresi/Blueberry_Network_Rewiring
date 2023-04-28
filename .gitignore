@@ -5,3 +5,4 @@
 # Ignore data but keep the directory
 results/*
 !results/.gitkeep
+data/*

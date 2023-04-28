@@ -1,32 +1,67 @@
-# Blueberry Network Rewiring
-Breed new blueberry cultivars that are resistant to the blueberry stem gall wasp. Examine standing genetic variation in the population of blueberry cultivars to identify resistant blueberry cultivars and the genomic loci responsible.
+# Purpose:
+I used this repository to track code and manage tasks for what I refer to as the "Blueberry Galling Project".
+This project is concerned with identifying the genes that are involved in resistance to the blueberry stem gall wasp.
+This project was also my first foray into mentoring; I worked with Alder Fulton, a very talented physics undergraduate (later a data scientist).
+We developed analyses together and practiced collaboration with Git.
 
-[Previously](https://github.com/EdgerLab/Blueberry_RNA_Seq_Expression_Analysis), differentially expressed genes were quantified from RNA-Seq data gathered from Liberty and Draper cultivars. Work now continues on comparing metabolic pathway flux and structure following gene expression perturbation following gall wasp infection.
+# Context:
+This repository is a sequel, companion respository to one where I did an RNA-Seq alignment, mapping, and quantification of differentially expressed genes (DEGs).
+That first repository is available at <https://github.com/sjteresi/Blueberry_RNA_Seq_Expression_Analysis>.
+This repository is the continuation of that project, here I took the RNA-Seq and DEG data and combined it with gene network and orthology-based analyses to examine the changes and genes associated with resistance as well as gall-development in resistant and susceptible cultivars.
+
+# Motivation:
+The blueberry stem gall wasp, *Hemadas nubilipennis* is an insect pest that lays its eggs in the stem of blueberry plants.
+Specifically, it lays its eggs in the stem of young shoots, and the oviposition site eventually develops into a gall, or bubble-like structure.
+The pest is a major detriment to blueberry harvests, as it terminates any further growth of the shoot, they are growth and nutrient sinks, and the galls are a large contamination risk for harvests.
+Typically, galls are pruned by hand, but this is expensive and time-consuming.
+Some blueberry cultivars are susceptible, and some exhibit resistance.
+
+What genes are being activated during the resistance response?
+What genes are being activated during the gall development phase?
+How do galls develop?
+Gall formation is the consequence of a complex and close interaction between the insect and its host-plant resulting from molecular hijacking; however, the chemical identity and mode of action of these stimuli/effectors originating from insect salivary secretions and/or oviposition fluids provided to the host remain unclear.
+
+# Solution:
+Broadly, the code does 2 main things:
+1. Identifies orthologs between Arabidopsis and blueberry.
+2. Takes the DEG and RNA-Seq data from the other project repository and transforms it
+	- Identifies gene co-expression modules with WGCNA
+	- Identifies GO terms and overlaps of DEGs with the gene co-expression modules
+	- Visualizes DEG changes over time
+
+# Code Execution Information:
+Most if not all of the code may be executed via the `Makefile`.
+This is the best reference for re-creating the project.
+The Makefile is one of my first attempts at using Make for code execution reproducibility, and made heavy use of the `PHONY` target paradigm, which might be considered unusual to most professional users of Make...
 
 # Contact Information:
 | Role          | Name          | GitHub                                                  | Email              |
 |---------------|---------------|---------------------------------------------------------|--------------------|
 | Project Lead: | Scott Teresi  | [Personal GitHub](https://github.com/huckleberry-hound) | <teresisc@msu.edu> |
 | Undergraduate: | Alder Fulton  | [Personal GitHub](https://github.com/Alder-pixel) | <fultona5@msu.edu> |
-| PI:           | Patrick Edger | [Lab GitHub](https://github.com/EdgerLab)               | <edgerpat@msu.edu> |
+| PI:           | Patrick Edger | NA               | <edgerpat@msu.edu> |
 
-# Genome Information:
-| Regular CoGe ID                   | Masked ID                                    |
-|-----------------------------------|----------------------------------------------|
-| Arabidopsis thaliana Col-0 (id 1) | CNS PL.20 Masked repeats 50X (v10, id 16746) |
-| Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
+# Version Control:
+We primarily conducted our analyses with Python and the Pandas library.
+We used Python 3.6.4.
+We used Pip to manage our Python packages in a virtual environment.
+Python package version control information can be found at `doc/python_requirements.txt`.
 
-# Code:
+## R Packages:
+We used TopGO and WGCNA for GO term and gene networks, respectively.
+Package information can be found in `doc/TopGO_sessionInfo.txt` and `doc/WGCNA_sessionInfo.txt`.
+
+# Code Walkthrough:
 The code is broken up into several different scripts inside the `src/` directory. The files are as follows:
 
-## Arabidopsis Blueberry Orthology:
+## Arabidopsis <-> Blueberry Orthology:
 - `filter_orthologs.py`: Master code file for executing and filtering gene orthology data. Creates an ortholog table by merging a set of syntelogs (SynMap) and a set of homologs (BLAST).
 	- Inputs: raw syntelog data from SynMap, see [SynMap Methods](#identifying-syntelogs), raw homolog data from BLAST, see [BLAST Methods](#identifying-homologs).
 	- Outputs: An ortholog table. Created so that each blueberry gene can have only 1 Arabidopsis gene match, and Arabidopsis genes can be repeated in this table (non-unique to each match).
 - `import_homologs.py`: Imports the homolog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
 - `import_syntelogs.py`: Imports syntelog data from the raw file and manages data filtration. Helper file of `filter_orthologs.py`.
 - `merge_homo_synt`: Merges the sets of homologs and syntelogs. Helper file of `filter_orthologs.py`. Prioritizes results from synteny over results from simple homology.
-- `blastall.sb`: BASH file that runs the BLAST search on the computing cluster.
+- `blastall.sb`: bash file that runs the BLAST search on the computing cluster.
 
 ## FPKM and TPM Evaluation:
 - `process_fpkm.py`: Generates an expression table in FPKM from a count matrix of blueberry genes.
@@ -49,10 +84,17 @@ The code is broken up into several different scripts inside the `src/` directory
 - Tutorial Followed:
 	- I followed the tutorials found at this [link](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/), where I specifically follow **part I**. The code found in `src/WGCNA` is an adapted version of the tutorials, there are no clinical traits that I am relating modules to.
 
-## Modules TODO:
+## Modules:
 - `filter_modules.py`: Find union of differential expression / orthology set with the WGCNA output of 10 genes assigned to modules.
-	- Inputs: WGCNA output file, Syntenny/homology output file, output folder
-	- Outputs: `TODO`
+	- Inputs: WGCNA output file, Synteny/homology output file, output folder
+	- Outputs: Tables of blueberry gene modules converted to their Arabidopsis orthologs
+- `module_expression_graphs.py`: Generate linegraphs of gene expression per module, over the multi-day treatments. This was done to contextualize the trends we saw, not used in the publication.
+- `module_log2fc_overlap.py`: Filters a set of log 2 FC (fold-change) genes that have a signal for up or down regulation in a given RNA-seq library context. Input files derived from analysis generated by Melanie, filtration and subsequent analysis performed by Scott.
+	- Inputs: Folder of tables of columns (blueberry genes, arabidopsis ortholog, E value, Point of Origin, RNA-Seq library context with float value for fold change)
+	- Outputs: 1 file, a table of Module ID and columns of the percent AND number of genes in a given expression context, up or down regulation.
+- `module_go_overlap.py`: Filters several datasets to show a set of interesting GO terms and their representation in the gene modules. 
+	- Inputs:  TODO
+	- Outputs:  TODO
 
 ##  TopGO:
 - `generate_gene_w_GO_term.py`: Filters a GO term data table of Arabidopsis genes
@@ -68,10 +110,6 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Version Control: `doc/TopGO_sessionInfo.txt`
 
 
-## Log\_2FC\_Melanie TODO flesh out more at a later date after conferring with Melanie:
-- `module_representation_log_2FC.py`: Filters a set of log 2 FC (fold-change) genes that have a signal for up or down regulation in a given RNA-seq library context. Input files derived from analysis generated by Melanie, filtration and subsequent analysis performed by Scott.
-	- Inputs: Folder of tables of columns (blueberry genes, arabidopsis ortholog, E value, Point of Origin, RNA-Seq library context with float value for fold change)
-	- Outputs: 1 file, a table of Module ID and columns of the percent AND number of genes in a given expression context, up or down regulation.
 
 ##  gene\_stats TODO:
 - `operations.py`: Calculates the percentages of each gene belonging to each identification type. Note: this is not used anywhere, and whenever a gene is found by both, Syntenny was chosen.
@@ -84,10 +122,6 @@ The code is broken up into several different scripts inside the `src/` directory
     - Inputs: Parent path of master protein/gene table from TAIR
     - Outputs: `Protein_and_Genes_Unfiltered.txt` (TEMP), `Filtered_Arabidopsis_Protein_Info.tsv`
 
-## Module Overlap:
-- `module_go_overlap.py`: Filters several datasets to show a set of interesting GO terms and their representation in the gene modules. 
-	- Inputs:  See docstring
-	- Outputs:  See docstring
 
 ## QTL:
 - `deg_qtl.py`: Subsets the QTL output data of interesting genes to determine
@@ -102,12 +136,10 @@ The code is broken up into several different scripts inside the `src/` directory
 
 
 ## Miscellaneous:
-- `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog.
+- `exp_table_melanie.py`: Generates an FPKM table of a blueberry gene and its syntelog. This was done to assist my co-author Melanie with data interpretation.
 	- Inputs: Parent path of FPKM table, parent path of syntelog table, output directory
 	- Outputs: Saves FPKM table as a tsv.
 
-## Python Requirements:
-We used Pip to manage our Python packages in a virtual environment. Python package version control information can be found at `requirements/common.txt`.
 
 # Methods Descriptions:
 ## Ortholog Identification
@@ -127,7 +159,12 @@ First we generate a BLAST database and prepare it for protein indices.
 Then we can run the BLAST algorithm on the two sequence files, this may take awhile.
 For notes on the options for `blastall`, please refer to the [documentation](https://www.ncbi.nlm.nih.gov/Class/BLAST/blastallopts.txt).
 
-TODO the blastp database was generated via...
+# Genome Information:
+| Regular CoGe ID                   | Masked ID                                    |
+|-----------------------------------|----------------------------------------------|
+| Arabidopsis thaliana Col-0 (id 1) | CNS PL.20 Masked repeats 50X (v10, id 16746) |
+| Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
 
-## Project News:
+
+# Project News:
 [Combating the blueberry stem gall wasp](https://www.canr.msu.edu/news/combating-the-blueberry-stem-gall-wasp#:~:text=The%20blueberry%20stem%20gall%20wasp%20is%20a%20tiny%20insect%20that,shoot%20and%20decreases%20fruit%20production.)
