@@ -165,6 +165,8 @@ For notes on the options for `blastall`, please refer to the [documentation](htt
 | Arabidopsis thaliana Col-0 (id 1) | CNS PL.20 Masked repeats 50X (v10, id 16746) |
 | Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
 
+Blueberry genome files taken from https://academic.oup.com/gigascience/article/8/3/giz012/5304886 (Haplotype-phased genome and evolution of phytonutrient pathways of tetraploid blueberry)
+
 
 # Project News:
 [Combating the blueberry stem gall wasp](https://www.canr.msu.edu/news/combating-the-blueberry-stem-gall-wasp#:~:text=The%20blueberry%20stem%20gall%20wasp%20is%20a%20tiny%20insect%20that,shoot%20and%20decreases%20fruit%20production.)
