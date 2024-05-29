@@ -93,8 +93,6 @@ The code is broken up into several different scripts inside the `src/` directory
 	- Inputs: Folder of tables of columns (blueberry genes, arabidopsis ortholog, E value, Point of Origin, RNA-Seq library context with float value for fold change)
 	- Outputs: 1 file, a table of Module ID and columns of the percent AND number of genes in a given expression context, up or down regulation.
 - `module_go_overlap.py`: Filters several datasets to show a set of interesting GO terms and their representation in the gene modules. 
-	- Inputs:  TODO
-	- Outputs:  TODO
 
 ##  TopGO:
 - `generate_gene_w_GO_term.py`: Filters a GO term data table of Arabidopsis genes
@@ -111,7 +109,7 @@ The code is broken up into several different scripts inside the `src/` directory
 
 
 
-##  gene\_stats TODO:
+##  gene\_stats:
 - `operations.py`: Calculates the percentages of each gene belonging to each identification type. Note: this is not used anywhere, and whenever a gene is found by both, Syntenny was chosen.
 - `summary_table.py`: Unifies the following dataframes - differentially expressed genes, Arabidopsis ortholog, Arabidopsis GO terms, and Blueberry gene network module identity.
 	- Inputs: File of bluberry genes with their module colors, file of blueberry genes and their Arabidopsis orthologs, Directory containing the differentially expressed files, file of Arabidopsis genes and its GO term list, Output filename, Output directory.
@@ -164,6 +162,8 @@ For notes on the options for `blastall`, please refer to the [documentation](htt
 |-----------------------------------|----------------------------------------------|
 | Arabidopsis thaliana Col-0 (id 1) | CNS PL.20 Masked repeats 50X (v10, id 16746) |
 | Vaccinium corymbosum (id 39928)   | mask w/ RepeatMasker (v3, id 58746)          |
+
+Blueberry genome files taken from https://academic.oup.com/gigascience/article/8/3/giz012/5304886 (Haplotype-phased genome and evolution of phytonutrient pathways of tetraploid blueberry)
 
 
 # Project News:

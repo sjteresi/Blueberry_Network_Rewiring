@@ -12,29 +12,30 @@ DEV_RESULTS := $(ROOT_DIR)/results
 DEV_DOCUMENTATION := $(ROOT_DIR)/doc
 
 # NB this is from the preceding project, where I ran EdgeR
-DEV_DIFFEXDIR := $(ROOT_DIR)/../Blueberry_RNA_Seq_Expression_Analysis/results/Diff_Ex/EdgeR_Output
+# not raw data, but LFS because difficult to obtain, and it is crucial to a lot of downstream analyses
+DEV_DIFFEXDIR := $(ROOT_DIR)/data/degs
 
-DEV_GENE_ANNOTATION := $(DEV_DATA)/V_corymbosum_v1.0_geneModels.gff
 
 # Orthology analysis related paths
 DEV_ORTHOLOGY_DATA := $(DEV_DATA)/orthology_data
-DEV_SYNTELOGS := $(DEV_ORTHOLOGY_DATA)/SynMap_Arabidopsis_Blueberry_8_12_2020.txt
-DEV_HOMOLOGS := $(DEV_ORTHOLOGY_DATA)/At-Blueberry.blast
-DEV_SYNTENY_HOMOLOGY_TABLE := $(DEV_ORTHOLOGY_DATA)/Synteny_Homology_Table.tsv 
+DEV_SYNTELOGS := $(DEV_ORTHOLOGY_DATA)/SynMap_Arabidopsis_Blueberry_8_12_2020.txt  # raw data, adding as LFS
+DEV_HOMOLOGS := $(DEV_ORTHOLOGY_DATA)/At-Blueberry.blast  # raw data, adding as LFS
+DEV_GENE_ANNOTATION := $(DEV_ORTHOLOGY_DATA)/V_corymbosum_v1.0_geneModels.gff  # raw data, adding as LFS
+DEV_SYNTENY_HOMOLOGY_TABLE := $(DEV_RESULTS)/Arabidopsis_Blueberry_Orthology/Synteny_Homology_Table.tsv
 
 # FPKM/TPM related paths
 DEV_EXPRESSION_OUT_DIR := $(DEV_DATA)/FPKM_TPM
-DEV_COLLATED_COUNT_FILE := $(DEV_DATA)/AllCounts_Blueberry.tsv
+DEV_COLLATED_COUNT_FILE := $(DEV_DATA)/AllCounts_Blueberry.tsv  # raw data from previous project, adding as LFS
 
 # WGCNA analysis related paths
 DEV_WGCNA_OUT_DIR := $(DEV_DATA)/WGCNA
-DEV_WGCNA_GENES_AND_MODULES := $(DEV_WGCNA_OUT_DIR)/Genes_and_ModuleColors.tsv
+DEV_WGCNA_GENES_AND_MODULES := $(DEV_WGCNA_OUT_DIR)/Genes_and_ModuleColors.tsv  # not raw data, but going to have as LFS because of the pain of generating it
 
 # Module filtering related paths
 DEV_MODULES_IN_AT := $(DEV_DATA)/Modules/modulecolors_AT
 
 # TopGO related paths
-DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_DATA)/ATH_GO_GOSLIM.txt
+DEV_DOWNLOADED_GO_UNIVERSE := $(DEV_ORTHOLOGY_DATA)/ATH_GO_GOSLIM.txt  # raw data, adding as LFS
 DEV_FILTERED_GO_OUTPUT := $(DEV_DATA)/GO/ArabidopsisGene_w_GO.tsv
 DEV_FILTERED_GO_OUTPUT_DIR := $(DEV_DATA)/GO/
 
